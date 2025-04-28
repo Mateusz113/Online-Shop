@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Annotation profile for online_shop" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="online-shop-bff-model-public" />
+        <module name="cart-service-core" />
+        <module name="cart-service-model" />
+        <module name="order-service-adapters" />
+        <module name="online-shop-bff-model" />
+        <module name="online-shop-bff-adapters" />
+        <module name="cart-service-adapters" />
+        <module name="product-service-adapters" />
+        <module name="online-shop-bff-core" />
+        <module name="order-service-model-public" />
+        <module name="product-service-core" />
+        <module name="product-service-model" />
+        <module name="cart-service-model-public" />
+        <module name="order-service-core" />
+        <module name="product-service-model-public" />
+        <module name="order_service_model" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="cart-service" options="-parameters" />
+      <module name="cart-service-adapters" options="-parameters" />
+      <module name="cart-service-core" options="-parameters" />
+      <module name="cart-service-model" options="-parameters" />
+      <module name="cart-service-model-public" options="-parameters" />
+      <module name="online-shop-bff" options="-parameters" />
+      <module name="online-shop-bff-adapters" options="-parameters" />
+      <module name="online-shop-bff-core" options="-parameters" />
+      <module name="online-shop-bff-model" options="-parameters" />
+      <module name="online-shop-bff-model-public" options="-parameters" />
+      <module name="online_shop" options="-parameters" />
+      <module name="order-service" options="-parameters" />
+      <module name="order-service-adapters" options="-parameters" />
+      <module name="order-service-core" options="-parameters" />
+      <module name="order-service-model-public" options="-parameters" />
+      <module name="order_service_model" options="-parameters" />
+      <module name="product-service" options="-parameters" />
+      <module name="product-service-adapters" options="-parameters" />
+      <module name="product-service-core" options="-parameters" />
+      <module name="product-service-model" options="-parameters" />
+      <module name="product-service-model-public" options="-parameters" />
+    </option>
+  </component>
+</project>
