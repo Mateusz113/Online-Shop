@@ -1,0 +1,79 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Mateusz113
+      changes:
+        - createTable:
+            tableName: PRODUCT
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: brand
+                  type: varchar(255)
+              - column:
+                  name: price
+                  type: decimal
+              - column:
+                  name: type
+                  type: varchar(255)
+              - column:
+                  name: available_amount
+                  type: integer
+        - createTable:
+            tableName: CUSTOMIZATION_ELEMENT
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: multiple_choice
+                  type: boolean
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    foreignKey: true
+                    foreignKeyName: fk_customization_element_product
+                    references: PRODUCT(id)
+        - createTable:
+            tableName: CUSTOMIZATION_OPTION
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: default_option
+                  type: boolean
+              - column:
+                  name: price_difference
+                  type: decimal
+              - column:
+                  name: customization_element_id
+                  type: bigint
+                  constraints:
+                    foreignKey: true
+                    foreignKeyName: fk_customization_element_customization_option
+                    references: CUSTOMIZATION_ELEMENT(id)
