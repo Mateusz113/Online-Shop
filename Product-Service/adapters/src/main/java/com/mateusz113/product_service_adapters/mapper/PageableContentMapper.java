@@ -6,7 +6,7 @@ import com.mateusz113.product_service_model_public.dto.PageableContentDto;
 import com.mateusz113.product_service_model_public.dto.ProductDto;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring", uses = {ProductMapper.class, CustomizationElementMapper.class, CustomizationOptionMapper.class})
+@Mapper(componentModel = "spring")
 public interface PageableContentMapper {
     PageableContentDto<ProductDto> modelToDto(PageableContent<Product> products);
 }
