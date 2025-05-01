@@ -12,6 +12,6 @@ public record UpsertProductCommand(
         BigDecimal price,
         String type,
         int availableAmount,
-        List<UpsertCustomizationElementCommand> customizationElements
+        List<UpsertCustomizationElementCommand> customizations
 ) {
 }

@@ -8,6 +8,6 @@ import java.util.List;
 public record UpsertCustomizationElementCommand(
         String name,
         boolean multipleChoice,
-        List<UpsertCustomizationOptionCommand> customizationOptions
+        List<UpsertCustomizationOptionCommand> options
 ) {
 }
