@@ -2,14 +2,17 @@ package com.mateusz113.product_service_adapters.util;
 
 import com.mateusz113.product_service_adapters.entity.CustomizationElementEntity;
 import com.mateusz113.product_service_adapters.entity.CustomizationOptionEntity;
+import com.mateusz113.product_service_adapters.entity.ProductDetailEntity;
 import com.mateusz113.product_service_adapters.entity.ProductEntity;
 import com.mateusz113.product_service_model.content_management.PageableContent;
 import com.mateusz113.product_service_model.customization.CustomizationElement;
 import com.mateusz113.product_service_model.customization.CustomizationOption;
 import com.mateusz113.product_service_model.product.Product;
+import com.mateusz113.product_service_model.product.ProductDetail;
 import com.mateusz113.product_service_model_public.commands.UpsertCustomizationElementCommand;
 import com.mateusz113.product_service_model_public.commands.UpsertCustomizationOptionCommand;
 import com.mateusz113.product_service_model_public.commands.UpsertProductCommand;
+import com.mateusz113.product_service_model_public.commands.UpsertProductDetailCommand;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +21,7 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class ProductServiceTestUtil {
+public class ProductServiceAdaptersTestUtil {
     public static Product getProduct() {
         return Product.builder()
                 .id(1L)
@@ -27,6 +30,7 @@ public class ProductServiceTestUtil {
                 .price(getDefaultPrice())
                 .type("type")
                 .availableAmount(getDefaultAvailableAmount())
+                .details(List.of(getProductDetail(), getProductDetail()))
                 .customizations(List.of(getCustomizationElement(), getCustomizationElement()))
                 .build();
     }
@@ -39,7 +43,24 @@ public class ProductServiceTestUtil {
                 .price(getDefaultPrice())
                 .type("type")
                 .availableAmount(getDefaultAvailableAmount())
+                .details(List.of(getProductDetailEntity(), getProductDetailEntity()))
                 .customizations(List.of(getCustomizationElementEntity(), getCustomizationElementEntity()))
+                .build();
+    }
+
+    public static ProductDetail getProductDetail() {
+        return ProductDetail.builder()
+                .id(1L)
+                .label("label")
+                .value("value")
+                .build();
+    }
+
+    public static ProductDetailEntity getProductDetailEntity() {
+        return ProductDetailEntity.builder()
+                .id(1L)
+                .label("label")
+                .value("value")
                 .build();
     }
 
@@ -48,7 +69,6 @@ public class ProductServiceTestUtil {
                 .id(1L)
                 .name("name")
                 .multipleChoice(true)
-                .product(null)
                 .options(List.of(getCustomizationOption(), getCustomizationOption()))
                 .build();
     }
@@ -58,7 +78,6 @@ public class ProductServiceTestUtil {
                 .id(1L)
                 .name("name")
                 .multipleChoice(true)
-                .product(null)
                 .options(List.of(getCustomizationOptionEntity(), getCustomizationOptionEntity()))
                 .build();
     }
@@ -69,7 +88,6 @@ public class ProductServiceTestUtil {
                 .name("name")
                 .defaultOption(false)
                 .priceDifference(getDefaultPriceDifference())
-                .customizationElement(null)
                 .build();
     }
 
@@ -79,7 +97,6 @@ public class ProductServiceTestUtil {
                 .name("name")
                 .defaultOption(false)
                 .priceDifference(getDefaultPriceDifference())
-                .customizationElement(null)
                 .build();
     }
 
@@ -94,7 +111,15 @@ public class ProductServiceTestUtil {
                 .price(getDefaultPrice())
                 .type("type")
                 .availableAmount(getDefaultAvailableAmount())
+                .details(List.of(getUpsertProductDetailCommand(), getUpsertProductDetailCommand()))
                 .customizations(List.of(getUpsertCustomizationElementCommand(), getUpsertCustomizationElementCommand()))
+                .build();
+    }
+
+    public static UpsertProductDetailCommand getUpsertProductDetailCommand() {
+        return UpsertProductDetailCommand.builder()
+                .label("label")
+                .value("value")
                 .build();
     }
 
