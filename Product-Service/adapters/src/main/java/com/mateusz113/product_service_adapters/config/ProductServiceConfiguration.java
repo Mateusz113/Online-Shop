@@ -7,7 +7,7 @@ import com.mateusz113.product_service_core.ProductServiceFacade;
 import com.mateusz113.product_service_core.ProductServiceVerifier;
 import com.mateusz113.product_service_core.ports.incoming.AddNewProducts;
 import com.mateusz113.product_service_core.ports.incoming.DeleteProduct;
-import com.mateusz113.product_service_core.ports.incoming.GetProduct;
+import com.mateusz113.product_service_core.ports.incoming.GetDetailedProduct;
 import com.mateusz113.product_service_core.ports.incoming.GetProducts;
 import com.mateusz113.product_service_core.ports.incoming.UpdateProduct;
 import com.mateusz113.product_service_core.ports.outgoing.ProductServiceDatabase;
@@ -44,7 +44,7 @@ public class ProductServiceConfiguration {
     }
 
     @Bean
-    public GetProduct getProduct(ProductServiceDatabase productServiceDatabase, ProductServiceVerifier verifier, Clock clock) {
+    public GetDetailedProduct getDetailedProduct(ProductServiceDatabase productServiceDatabase, ProductServiceVerifier verifier, Clock clock) {
         return new ProductServiceFacade(productServiceDatabase, verifier, clock);
     }
 
