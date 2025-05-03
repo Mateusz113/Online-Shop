@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import static com.mateusz113.product_service_adapters.util.ProductServiceTestUtil.*;
+import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PageableContentMapperTest {

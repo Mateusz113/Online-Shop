@@ -7,8 +7,10 @@ import com.mateusz113.product_service_adapters.entity.ProductEntity;
 import com.mateusz113.product_service_model.content_management.PageableContent;
 import com.mateusz113.product_service_model.customization.CustomizationElement;
 import com.mateusz113.product_service_model.customization.CustomizationOption;
+import com.mateusz113.product_service_model.filter.ProductFilter;
 import com.mateusz113.product_service_model.product.Product;
 import com.mateusz113.product_service_model.product.ProductDetail;
+import com.mateusz113.product_service_model_public.commands.FilterProductCommand;
 import com.mateusz113.product_service_model_public.commands.UpsertCustomizationElementCommand;
 import com.mateusz113.product_service_model_public.commands.UpsertCustomizationOptionCommand;
 import com.mateusz113.product_service_model_public.commands.UpsertProductCommand;
@@ -35,6 +37,36 @@ public class ProductServiceAdaptersTestUtil {
                 .build();
     }
 
+    public static Product getProduct(String name, String brand, BigDecimal price, String type, Integer availableAmount) {
+        return Product.builder()
+                .id(null)
+                .name(name)
+                .brand(brand)
+                .price(price)
+                .type(type)
+                .availableAmount(availableAmount)
+                .build();
+    }
+
+    public static Product getProductWithoutIds() {
+        Product product = Product.builder()
+                .id(null)
+                .name("name")
+                .brand("brand")
+                .price(getDefaultPrice())
+                .type("type")
+                .availableAmount(getDefaultAvailableAmount())
+                .details(List.of(getProductDetail(), getProductDetail()))
+                .customizations(List.of(getCustomizationElement(), getCustomizationElement()))
+                .build();
+        product.getDetails().forEach(productDetail -> productDetail.setId(null));
+        product.getCustomizations().forEach(customizationElement -> {
+            customizationElement.setId(null);
+            customizationElement.getOptions().forEach(customizationOption -> customizationOption.setId(null));
+        });
+        return product;
+    }
+
     public static ProductEntity getProductEntity() {
         return ProductEntity.builder()
                 .id(1L)
@@ -52,7 +84,7 @@ public class ProductServiceAdaptersTestUtil {
         return ProductDetail.builder()
                 .id(1L)
                 .label("label")
-                .value("value")
+                .description("description")
                 .build();
     }
 
@@ -60,7 +92,7 @@ public class ProductServiceAdaptersTestUtil {
         return ProductDetailEntity.builder()
                 .id(1L)
                 .label("label")
-                .value("value")
+                .description("description")
                 .build();
     }
 
@@ -100,6 +132,28 @@ public class ProductServiceAdaptersTestUtil {
                 .build();
     }
 
+    public static ProductFilter getProductFilter() {
+        return ProductFilter.builder()
+                .name("name")
+                .brand("brand")
+                .minPrice(getDefaultPrice())
+                .maxPrice(getDefaultPrice())
+                .type("type")
+                .minAvailableAmount(getDefaultAvailableAmount())
+                .build();
+    }
+
+    public static FilterProductCommand getFilterProductCommand() {
+        return FilterProductCommand.builder()
+                .name("name")
+                .brand("brand")
+                .minPrice(getDefaultPrice())
+                .maxPrice(getDefaultPrice())
+                .type("type")
+                .minAvailableAmount(getDefaultAvailableAmount())
+                .build();
+    }
+
     public static Page<ProductEntity> getPageOfProductEntity(int pageNumber, int pageSize) {
         return new PageImpl<>(List.of(getProductEntity(), getProductEntity()), PageRequest.of(pageNumber, pageSize), 2);
     }
@@ -119,7 +173,7 @@ public class ProductServiceAdaptersTestUtil {
     public static UpsertProductDetailCommand getUpsertProductDetailCommand() {
         return UpsertProductDetailCommand.builder()
                 .label("label")
-                .value("value")
+                .description("description")
                 .build();
     }
 
@@ -141,7 +195,7 @@ public class ProductServiceAdaptersTestUtil {
 
     public static PageableContent<Product> getProductPageableContent(Pageable pageable) {
         return PageableContent.<Product>builder()
-                .totalElements(2)
+                .totalElements(2L)
                 .totalPages((int) Math.ceil((double) 2 / pageable.getPageSize()))
                 .pageSize(pageable.getPageSize())
                 .pageNumber(pageable.getPageNumber())

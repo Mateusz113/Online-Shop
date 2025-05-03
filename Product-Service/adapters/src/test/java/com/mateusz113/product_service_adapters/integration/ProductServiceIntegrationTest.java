@@ -1,30 +1,26 @@
-package com.mateusz113.product_service_adapters.controller;
+package com.mateusz113.product_service_adapters.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mateusz113.product_service_adapters.mapper.ProductMapper;
-import com.mateusz113.product_service_core.ports.incoming.AddNewProducts;
-import com.mateusz113.product_service_core.ports.incoming.DeleteProduct;
-import com.mateusz113.product_service_core.ports.incoming.GetDetailedProduct;
-import com.mateusz113.product_service_core.ports.incoming.GetProducts;
-import com.mateusz113.product_service_core.ports.incoming.UpdateProduct;
-import com.mateusz113.product_service_model.content_management.PageableContent;
-import com.mateusz113.product_service_model.filter.ProductFilter;
+import com.mateusz113.product_service_core.ports.outgoing.ProductServiceDatabase;
+import com.mateusz113.product_service_model.customization.CustomizationOption;
 import com.mateusz113.product_service_model.product.Product;
+import com.mateusz113.product_service_model_public.commands.UpsertCustomizationOptionCommand;
 import com.mateusz113.product_service_model_public.commands.UpsertProductCommand;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.*;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -32,108 +28,102 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ProductServiceControllerTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Transactional
+public class ProductServiceIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private ProductMapper productMapper;
-    @MockitoBean
-    public AddNewProducts addNewProducts;
-    @MockitoBean
-    public DeleteProduct deleteProduct;
-    @MockitoBean
-    public GetDetailedProduct getDetailedProduct;
-    @MockitoBean
-    public GetProducts getProducts;
-    @MockitoBean
-    public UpdateProduct updateProduct;
+    private ProductServiceDatabase database;
+
+    @BeforeEach
+    void setUp() {
+        IntStream.of(0, 1).forEach(i -> database.save(getProductWithoutIds()));
+    }
 
     @Test
-    void addNewProducts_ReturnsProductDtoListWithStatus201() throws Exception {
-        List<UpsertProductCommand> upsertProductCommands = List.of(getUpsertProductCommand(), getUpsertProductCommand());
-        List<Product> products = productMapper.commandListToModelList(upsertProductCommands);
-        when(addNewProducts.add(products)).thenReturn(products);
-        mockMvc.perform(
-                        post("/products")
-                                .contentType("application/json")
-                                .content(objectMapper.writeValueAsString(upsertProductCommands)))
+    void addNewProducts_SavesProductsAndReturnsListOfProductDtoWithStatus201() throws Exception {
+        List<UpsertProductCommand> commands = List.of(getUpsertProductCommand(), getUpsertProductCommand());
+
+        mockMvc.perform(post("/products")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(commands)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$[0].id").value(nullValue()))
+                .andExpect(jsonPath("$[0].id").value(3))
                 .andExpect(jsonPath("$[0].name").value("name"))
                 .andExpect(jsonPath("$[0].brand").value("brand"))
                 .andExpect(jsonPath("$[0].price").value(getDefaultPrice()))
                 .andExpect(jsonPath("$[0].type").value("type"))
                 .andExpect(jsonPath("$[0].availableAmount").value(getDefaultAvailableAmount()))
-                .andExpect(jsonPath("$[0].customizations[0].id").value(nullValue()))
+                .andExpect(jsonPath("$[0].customizations[0].id").value(5))
                 .andExpect(jsonPath("$[0].customizations[0].name").value("name"))
                 .andExpect(jsonPath("$[0].customizations[0].multipleChoice").value(true))
-                .andExpect(jsonPath("$[0].customizations[0].options[0].id").value(nullValue()))
+                .andExpect(jsonPath("$[0].customizations[0].options[0].id").value(9))
                 .andExpect(jsonPath("$[0].customizations[0].options[0].name").value("name"))
                 .andExpect(jsonPath("$[0].customizations[0].options[0].defaultOption").value(false))
                 .andExpect(jsonPath("$[0].customizations[0].options[0].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$[0].customizations[0].options[1].id").value(nullValue()))
+                .andExpect(jsonPath("$[0].customizations[0].options[1].id").value(10))
                 .andExpect(jsonPath("$[0].customizations[0].options[1].name").value("name"))
                 .andExpect(jsonPath("$[0].customizations[0].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$[0].customizations[0].options[1].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$[0].customizations[1].id").value(nullValue()))
+                .andExpect(jsonPath("$[0].customizations[1].id").value(6))
                 .andExpect(jsonPath("$[0].customizations[1].name").value("name"))
                 .andExpect(jsonPath("$[0].customizations[1].multipleChoice").value(true))
-                .andExpect(jsonPath("$[0].customizations[1].options[0].id").value(nullValue()))
+                .andExpect(jsonPath("$[0].customizations[1].options[0].id").value(11))
                 .andExpect(jsonPath("$[0].customizations[1].options[0].name").value("name"))
                 .andExpect(jsonPath("$[0].customizations[1].options[0].defaultOption").value(false))
                 .andExpect(jsonPath("$[0].customizations[1].options[0].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$[0].customizations[1].options[1].id").value(nullValue()))
+                .andExpect(jsonPath("$[0].customizations[1].options[1].id").value(12))
                 .andExpect(jsonPath("$[0].customizations[1].options[1].name").value("name"))
                 .andExpect(jsonPath("$[0].customizations[1].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$[0].customizations[1].options[1].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$[1].id").value(nullValue()))
+                .andExpect(jsonPath("$[1].id").value(4))
                 .andExpect(jsonPath("$[1].name").value("name"))
                 .andExpect(jsonPath("$[1].brand").value("brand"))
                 .andExpect(jsonPath("$[1].price").value(getDefaultPrice()))
                 .andExpect(jsonPath("$[1].type").value("type"))
                 .andExpect(jsonPath("$[1].availableAmount").value(getDefaultAvailableAmount()))
-                .andExpect(jsonPath("$[1].customizations[0].id").value(nullValue()))
+                .andExpect(jsonPath("$[1].customizations[0].id").value(7))
                 .andExpect(jsonPath("$[1].customizations[0].name").value("name"))
                 .andExpect(jsonPath("$[1].customizations[0].multipleChoice").value(true))
-                .andExpect(jsonPath("$[1].customizations[0].options[0].id").value(nullValue()))
+                .andExpect(jsonPath("$[1].customizations[0].options[0].id").value(13))
                 .andExpect(jsonPath("$[1].customizations[0].options[0].name").value("name"))
                 .andExpect(jsonPath("$[1].customizations[0].options[0].defaultOption").value(false))
                 .andExpect(jsonPath("$[1].customizations[0].options[0].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$[1].customizations[0].options[1].id").value(nullValue()))
+                .andExpect(jsonPath("$[1].customizations[0].options[1].id").value(14))
                 .andExpect(jsonPath("$[1].customizations[0].options[1].name").value("name"))
                 .andExpect(jsonPath("$[1].customizations[0].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$[1].customizations[0].options[1].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$[1].customizations[1].id").value(nullValue()))
+                .andExpect(jsonPath("$[1].customizations[1].id").value(8))
                 .andExpect(jsonPath("$[1].customizations[1].name").value("name"))
                 .andExpect(jsonPath("$[1].customizations[1].multipleChoice").value(true))
-                .andExpect(jsonPath("$[1].customizations[1].options[0].id").value(nullValue()))
+                .andExpect(jsonPath("$[1].customizations[1].options[0].id").value(15))
                 .andExpect(jsonPath("$[1].customizations[1].options[0].name").value("name"))
                 .andExpect(jsonPath("$[1].customizations[1].options[0].defaultOption").value(false))
                 .andExpect(jsonPath("$[1].customizations[1].options[0].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$[1].customizations[1].options[1].id").value(nullValue()))
+                .andExpect(jsonPath("$[1].customizations[1].options[1].id").value(16))
                 .andExpect(jsonPath("$[1].customizations[1].options[1].name").value("name"))
                 .andExpect(jsonPath("$[1].customizations[1].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$[1].customizations[1].options[1].priceDifference").value(getDefaultPriceDifference()));
     }
 
     @Test
-    void getProducts_ReturnsPageableContentDtoWithStatus200() throws Exception {
-        Pageable pageable = PageRequest.of(0, 3);
-        PageableContent<Product> productPageableContent = getProductPageableContent(pageable);
-        ProductFilter filter = ProductFilter.builder().build();
-        when(getProducts.getAll(filter, pageable.getPageNumber(), pageable.getPageSize())).thenReturn(productPageableContent);
+    void getProducts_ReturnsProductDtoPageableContentDtoWithStatus200() throws Exception {
+        int pageNumber = 0;
+        int pageSize = 2;
+
         mockMvc.perform(get("/products")
-                        .param("page", String.valueOf(pageable.getPageNumber()))
-                        .param("size", String.valueOf(pageable.getPageSize())))
+                        .param("page", String.valueOf(pageNumber))
+                        .param("size", String.valueOf(pageSize)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalPages").value(1))
                 .andExpect(jsonPath("$.totalElements").value(2))
-                .andExpect(jsonPath("$.pageNumber").value(pageable.getPageNumber()))
-                .andExpect(jsonPath("$.pageSize").value(pageable.getPageSize()))
+                .andExpect(jsonPath("$.pageNumber").value(pageNumber))
+                .andExpect(jsonPath("$.pageSize").value(pageSize))
                 .andExpect(jsonPath("$.elements").isNotEmpty())
                 .andExpect(jsonPath("$.elements[0].id").value(1))
                 .andExpect(jsonPath("$.elements[0].name").value("name"))
@@ -148,56 +138,55 @@ public class ProductServiceControllerTest {
                 .andExpect(jsonPath("$.elements[0].customizations[0].options[0].name").value("name"))
                 .andExpect(jsonPath("$.elements[0].customizations[0].options[0].defaultOption").value(false))
                 .andExpect(jsonPath("$.elements[0].customizations[0].options[0].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$.elements[0].customizations[0].options[1].id").value(1))
+                .andExpect(jsonPath("$.elements[0].customizations[0].options[1].id").value(2))
                 .andExpect(jsonPath("$.elements[0].customizations[0].options[1].name").value("name"))
                 .andExpect(jsonPath("$.elements[0].customizations[0].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$.elements[0].customizations[0].options[1].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$.elements[0].customizations[1].id").value(1))
+                .andExpect(jsonPath("$.elements[0].customizations[1].id").value(2))
                 .andExpect(jsonPath("$.elements[0].customizations[1].name").value("name"))
                 .andExpect(jsonPath("$.elements[0].customizations[1].multipleChoice").value(true))
-                .andExpect(jsonPath("$.elements[0].customizations[1].options[0].id").value(1))
+                .andExpect(jsonPath("$.elements[0].customizations[1].options[0].id").value(3))
                 .andExpect(jsonPath("$.elements[0].customizations[1].options[0].name").value("name"))
                 .andExpect(jsonPath("$.elements[0].customizations[1].options[0].defaultOption").value(false))
                 .andExpect(jsonPath("$.elements[0].customizations[1].options[0].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$.elements[0].customizations[1].options[1].id").value(1))
+                .andExpect(jsonPath("$.elements[0].customizations[1].options[1].id").value(4))
                 .andExpect(jsonPath("$.elements[0].customizations[1].options[1].name").value("name"))
                 .andExpect(jsonPath("$.elements[0].customizations[1].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$.elements[0].customizations[1].options[1].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$.elements[1].id").value(1))
+                .andExpect(jsonPath("$.elements[1].id").value(2))
                 .andExpect(jsonPath("$.elements[1].name").value("name"))
                 .andExpect(jsonPath("$.elements[1].brand").value("brand"))
                 .andExpect(jsonPath("$.elements[1].price").value(getDefaultPrice()))
                 .andExpect(jsonPath("$.elements[1].type").value("type"))
                 .andExpect(jsonPath("$.elements[1].availableAmount").value(getDefaultAvailableAmount()))
-                .andExpect(jsonPath("$.elements[1].customizations[0].id").value(1))
+                .andExpect(jsonPath("$.elements[1].customizations[0].id").value(3))
                 .andExpect(jsonPath("$.elements[1].customizations[0].name").value("name"))
                 .andExpect(jsonPath("$.elements[1].customizations[0].multipleChoice").value(true))
-                .andExpect(jsonPath("$.elements[1].customizations[0].options[0].id").value(1))
+                .andExpect(jsonPath("$.elements[1].customizations[0].options[0].id").value(5))
                 .andExpect(jsonPath("$.elements[1].customizations[0].options[0].name").value("name"))
                 .andExpect(jsonPath("$.elements[1].customizations[0].options[0].defaultOption").value(false))
                 .andExpect(jsonPath("$.elements[1].customizations[0].options[0].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$.elements[1].customizations[0].options[1].id").value(1))
+                .andExpect(jsonPath("$.elements[1].customizations[0].options[1].id").value(6))
                 .andExpect(jsonPath("$.elements[1].customizations[0].options[1].name").value("name"))
                 .andExpect(jsonPath("$.elements[1].customizations[0].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$.elements[1].customizations[0].options[1].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$.elements[1].customizations[1].id").value(1))
+                .andExpect(jsonPath("$.elements[1].customizations[1].id").value(4))
                 .andExpect(jsonPath("$.elements[1].customizations[1].name").value("name"))
                 .andExpect(jsonPath("$.elements[1].customizations[1].multipleChoice").value(true))
-                .andExpect(jsonPath("$.elements[1].customizations[1].options[0].id").value(1))
+                .andExpect(jsonPath("$.elements[1].customizations[1].options[0].id").value(7))
                 .andExpect(jsonPath("$.elements[1].customizations[1].options[0].name").value("name"))
                 .andExpect(jsonPath("$.elements[1].customizations[1].options[0].defaultOption").value(false))
                 .andExpect(jsonPath("$.elements[1].customizations[1].options[0].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$.elements[1].customizations[1].options[1].id").value(1))
+                .andExpect(jsonPath("$.elements[1].customizations[1].options[1].id").value(8))
                 .andExpect(jsonPath("$.elements[1].customizations[1].options[1].name").value("name"))
                 .andExpect(jsonPath("$.elements[1].customizations[1].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$.elements[1].customizations[1].options[1].priceDifference").value(getDefaultPriceDifference()));
     }
 
     @Test
-    void getProductById_ReturnsProductDtoWithStatus200() throws Exception {
+    void getProductById_ReturnsDetailedProductDtoWithStatus200() throws Exception {
         Long id = 1L;
-        Product product = getProduct();
-        when(getDetailedProduct.getById(id)).thenReturn(product);
+
         mockMvc.perform(get("/products/{id}", id))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -210,7 +199,7 @@ public class ProductServiceControllerTest {
                 .andExpect(jsonPath("$.details[0].id").value(1))
                 .andExpect(jsonPath("$.details[0].label").value("label"))
                 .andExpect(jsonPath("$.details[0].description").value("description"))
-                .andExpect(jsonPath("$.details[1].id").value(1))
+                .andExpect(jsonPath("$.details[1].id").value(2))
                 .andExpect(jsonPath("$.details[1].label").value("label"))
                 .andExpect(jsonPath("$.details[1].description").value("description"))
                 .andExpect(jsonPath("$.customizations[0].id").value(1))
@@ -220,18 +209,18 @@ public class ProductServiceControllerTest {
                 .andExpect(jsonPath("$.customizations[0].options[0].name").value("name"))
                 .andExpect(jsonPath("$.customizations[0].options[0].defaultOption").value(false))
                 .andExpect(jsonPath("$.customizations[0].options[0].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$.customizations[0].options[1].id").value(1))
+                .andExpect(jsonPath("$.customizations[0].options[1].id").value(2))
                 .andExpect(jsonPath("$.customizations[0].options[1].name").value("name"))
                 .andExpect(jsonPath("$.customizations[0].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$.customizations[0].options[1].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$.customizations[1].id").value(1))
+                .andExpect(jsonPath("$.customizations[1].id").value(2))
                 .andExpect(jsonPath("$.customizations[1].name").value("name"))
                 .andExpect(jsonPath("$.customizations[1].multipleChoice").value(true))
-                .andExpect(jsonPath("$.customizations[1].options[0].id").value(1))
+                .andExpect(jsonPath("$.customizations[1].options[0].id").value(3))
                 .andExpect(jsonPath("$.customizations[1].options[0].name").value("name"))
                 .andExpect(jsonPath("$.customizations[1].options[0].defaultOption").value(false))
                 .andExpect(jsonPath("$.customizations[1].options[0].priceDifference").value(getDefaultPriceDifference()))
-                .andExpect(jsonPath("$.customizations[1].options[1].id").value(1))
+                .andExpect(jsonPath("$.customizations[1].options[1].id").value(4))
                 .andExpect(jsonPath("$.customizations[1].options[1].name").value("name"))
                 .andExpect(jsonPath("$.customizations[1].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$.customizations[1].options[1].priceDifference").value(getDefaultPriceDifference()));
@@ -241,14 +230,31 @@ public class ProductServiceControllerTest {
     void updateProduct_UpdatesProductAndReturnsStatus204() throws Exception {
         Long id = 1L;
         UpsertProductCommand upsertProductCommand = getUpsertProductCommand();
-        Product product = productMapper.commandToModel(upsertProductCommand);
 
         mockMvc.perform(patch("/products/{id}", id)
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(upsertProductCommand)))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-        verify(updateProduct, times(1)).update(product, id);
+        Product product = database.findById(id).orElseThrow(IllegalStateException::new);
+        assertEquals(upsertProductCommand.name(), product.getName());
+        assertEquals(upsertProductCommand.brand(), product.getBrand());
+        assertEquals(upsertProductCommand.price(), product.getPrice());
+        assertEquals(upsertProductCommand.type(), product.getType());
+        assertEquals(upsertProductCommand.availableAmount(), product.getAvailableAmount());
+        for (int i = 0; i < 2; i++) {
+            assertEquals(upsertProductCommand.details().get(i).label(), product.getDetails().get(i).getLabel());
+            assertEquals(upsertProductCommand.details().get(i).description(), product.getDetails().get(i).getDescription());
+            assertEquals(upsertProductCommand.customizations().get(i).name(), product.getCustomizations().get(i).getName());
+            assertEquals(upsertProductCommand.customizations().get(i).multipleChoice(), product.getCustomizations().get(i).getMultipleChoice());
+            for (int j = 0; j < 2; j++) {
+                List<UpsertCustomizationOptionCommand> customizationOptionCommands = upsertProductCommand.customizations().get(i).options();
+                List<CustomizationOption> customizationOptions = product.getCustomizations().get(i).getOptions();
+                assertEquals(customizationOptionCommands.get(j).name(), customizationOptions.get(j).getName());
+                assertEquals(customizationOptionCommands.get(j).defaultOption(), customizationOptions.get(j).getDefaultOption());
+                assertEquals(customizationOptionCommands.get(j).priceDifference(), customizationOptions.get(j).getPriceDifference());
+            }
+        }
     }
 
     @Test
@@ -258,6 +264,6 @@ public class ProductServiceControllerTest {
         mockMvc.perform(delete("/products/{id}", id))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-        verify(deleteProduct, times(1)).delete(id);
+        assertTrue(database.findById(id).isEmpty());
     }
 }

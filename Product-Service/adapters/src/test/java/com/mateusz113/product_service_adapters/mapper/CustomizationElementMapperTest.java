@@ -7,8 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import static com.mateusz113.product_service_adapters.util.ProductServiceTestUtil.getCustomizationElement;
-import static com.mateusz113.product_service_adapters.util.ProductServiceTestUtil.getDefaultPriceDifference;
+import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.getCustomizationElement;
+import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.getDefaultPriceDifference;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CustomizationElementMapperTest {
@@ -27,12 +27,12 @@ public class CustomizationElementMapperTest {
 
         assertEquals(1, result.getId());
         assertEquals("name", result.getName());
-        assertTrue(result.isMultipleChoice());
+        assertTrue(result.getMultipleChoice());
         assertNull(result.getProduct());
         for (CustomizationOptionEntity option : result.getOptions()) {
             assertEquals(1, option.getId());
             assertEquals("name", option.getName());
-            assertFalse(option.isDefaultOption());
+            assertFalse(option.getDefaultOption());
             assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
             assertNull(option.getCustomizationElement());
         }

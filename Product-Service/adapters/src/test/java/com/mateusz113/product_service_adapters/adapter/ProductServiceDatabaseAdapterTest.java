@@ -7,16 +7,20 @@ import com.mateusz113.product_service_adapters.repository.ProductEntityRepositor
 import com.mateusz113.product_service_model.content_management.PageableContent;
 import com.mateusz113.product_service_model.customization.CustomizationElement;
 import com.mateusz113.product_service_model.customization.CustomizationOption;
+import com.mateusz113.product_service_model.filter.ProductFilter;
 import com.mateusz113.product_service_model.product.Product;
+import com.mateusz113.product_service_model.product.ProductDetail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Optional;
 
-import static com.mateusz113.product_service_adapters.util.ProductServiceTestUtil.*;
+import static com.mateusz113.product_service_adapters.specification.ProductSpecification.getSpecificationFromFilter;
+import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -45,31 +49,24 @@ public class ProductServiceDatabaseAdapterTest {
         assertEquals(getDefaultPrice(), result.getPrice());
         assertEquals("type", result.getType());
         assertEquals(getDefaultAvailableAmount(), result.getAvailableAmount());
-        for (int i = 0; i < 2; i++) {
-            CustomizationElement element = result.getCustomizations().get(i);
+        for (ProductDetail detail : result.getDetails()) {
+            assertEquals(1L, detail.getId());
+            assertEquals("label", detail.getLabel());
+            assertEquals("description", detail.getDescription());
+        }
+        for (CustomizationElement element : result.getCustomizations()) {
             assertEquals(1L, element.getId());
             assertEquals("name", element.getName());
-            assertTrue(element.isMultipleChoice());
+            assertTrue(element.getMultipleChoice());
             assertNull(element.getProduct());
-            for (int j = 0; i < 2; i++) {
-                CustomizationOption option = element.getOptions().get(j);
+            for (CustomizationOption option : element.getOptions()) {
                 assertEquals(1L, option.getId());
                 assertEquals("name", option.getName());
-                assertFalse(option.isDefaultOption());
+                assertFalse(option.getDefaultOption());
                 assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
                 assertNull(option.getCustomizationElement());
             }
         }
-    }
-
-    @Test
-    void delete_DeletesProduct() {
-        Product productToDelete = getProduct();
-        ProductEntityArgumentMatcher argumentMatcher = new ProductEntityArgumentMatcher(getProductEntity());
-
-        adapter.delete(productToDelete);
-
-        verify(repository, times(1)).delete(argThat(argumentMatcher));
     }
 
     @Test
@@ -87,17 +84,20 @@ public class ProductServiceDatabaseAdapterTest {
                     assertEquals(getDefaultPrice(), product.getPrice());
                     assertEquals("type", product.getType());
                     assertEquals(getDefaultAvailableAmount(), product.getAvailableAmount());
-                    for (int i = 0; i < 2; i++) {
-                        CustomizationElement element = product.getCustomizations().get(i);
+                    for (ProductDetail detail : product.getDetails()) {
+                        assertEquals(1L, detail.getId());
+                        assertEquals("label", detail.getLabel());
+                        assertEquals("description", detail.getDescription());
+                    }
+                    for (CustomizationElement element : product.getCustomizations()) {
                         assertEquals(1L, element.getId());
                         assertEquals("name", element.getName());
-                        assertTrue(element.isMultipleChoice());
+                        assertTrue(element.getMultipleChoice());
                         assertNull(element.getProduct());
-                        for (int j = 0; i < 2; i++) {
-                            CustomizationOption option = element.getOptions().get(j);
+                        for (CustomizationOption option : element.getOptions()) {
                             assertEquals(1L, option.getId());
                             assertEquals("name", option.getName());
-                            assertFalse(option.isDefaultOption());
+                            assertFalse(option.getDefaultOption());
                             assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
                             assertNull(option.getCustomizationElement());
                         }
@@ -112,33 +112,37 @@ public class ProductServiceDatabaseAdapterTest {
         int pageNumber = 0;
         int pageSize = 3;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        when(repository.findAll(pageable)).thenReturn(getPageOfProductEntity(pageNumber, pageSize));
+        ProductFilter filter = getProductFilter();
+        Specification<ProductEntity> specification = getSpecificationFromFilter(filter);
+        when(repository.findAll(any(Specification.class), eq(pageable))).thenReturn(getPageOfProductEntity(pageNumber, pageSize));
 
-        PageableContent<Product> result = adapter.findAll(pageNumber, pageSize);
+        PageableContent<Product> result = adapter.findAll(filter, pageNumber, pageSize);
 
         assertEquals(1, result.totalPages());
         assertEquals(2, result.totalElements());
         assertEquals(pageNumber, result.pageNumber());
         assertEquals(pageSize, result.pageSize());
-        for (int i = 0; i < 2; i++) {
-            Product product = result.elements().get(i);
+        for (Product product : result.elements()) {
             assertEquals(1L, product.getId());
             assertEquals("name", product.getName());
             assertEquals("brand", product.getBrand());
             assertEquals(getDefaultPrice(), product.getPrice());
             assertEquals("type", product.getType());
             assertEquals(getDefaultAvailableAmount(), product.getAvailableAmount());
-            for (int j = 0; i < 2; i++) {
-                CustomizationElement element = product.getCustomizations().get(j);
+            for (ProductDetail detail : product.getDetails()) {
+                assertEquals(1L, detail.getId());
+                assertEquals("label", detail.getLabel());
+                assertEquals("description", detail.getDescription());
+            }
+            for (CustomizationElement element : product.getCustomizations()) {
                 assertEquals(1L, element.getId());
                 assertEquals("name", element.getName());
-                assertTrue(element.isMultipleChoice());
+                assertTrue(element.getMultipleChoice());
                 assertNull(element.getProduct());
-                for (int k = 0; i < 2; i++) {
-                    CustomizationOption option = element.getOptions().get(k);
+                for (CustomizationOption option : element.getOptions()) {
                     assertEquals(1L, option.getId());
                     assertEquals("name", option.getName());
-                    assertFalse(option.isDefaultOption());
+                    assertFalse(option.getDefaultOption());
                     assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
                     assertNull(option.getCustomizationElement());
                 }
@@ -147,42 +151,12 @@ public class ProductServiceDatabaseAdapterTest {
     }
 
     @Test
-    void findByType_ReturnsPageableContentOfProductsWithGivenType() {
-        String type = "type";
-        int pageNumber = 0;
-        int pageSize = 3;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        when(repository.findByType(type, pageable)).thenReturn(getPageOfProductEntity(pageNumber, pageSize));
+    void delete_DeletesProduct() {
+        Product productToDelete = getProduct();
+        ProductEntityArgumentMatcher argumentMatcher = new ProductEntityArgumentMatcher(getProductEntity());
 
-        PageableContent<Product> result = adapter.findByType(type, pageNumber, pageSize);
+        adapter.delete(productToDelete);
 
-        assertEquals(1, result.totalPages());
-        assertEquals(2, result.totalElements());
-        assertEquals(pageNumber, result.pageNumber());
-        assertEquals(pageSize, result.pageSize());
-        for (int i = 0; i < 2; i++) {
-            Product product = result.elements().get(i);
-            assertEquals(1L, product.getId());
-            assertEquals("name", product.getName());
-            assertEquals("brand", product.getBrand());
-            assertEquals(getDefaultPrice(), product.getPrice());
-            assertEquals("type", product.getType());
-            assertEquals(getDefaultAvailableAmount(), product.getAvailableAmount());
-            for (int j = 0; i < 2; i++) {
-                CustomizationElement element = product.getCustomizations().get(j);
-                assertEquals(1L, element.getId());
-                assertEquals("name", element.getName());
-                assertTrue(element.isMultipleChoice());
-                assertNull(element.getProduct());
-                for (int k = 0; i < 2; i++) {
-                    CustomizationOption option = element.getOptions().get(k);
-                    assertEquals(1L, option.getId());
-                    assertEquals("name", option.getName());
-                    assertFalse(option.isDefaultOption());
-                    assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
-                    assertNull(option.getCustomizationElement());
-                }
-            }
-        }
+        verify(repository, times(1)).delete(argThat(argumentMatcher));
     }
 }
