@@ -8,6 +8,6 @@ import lombok.Data;
 public class ProductDetail {
     private Long id;
     private String label;
-    private String value;
+    private String description;
     private Product product;
 }

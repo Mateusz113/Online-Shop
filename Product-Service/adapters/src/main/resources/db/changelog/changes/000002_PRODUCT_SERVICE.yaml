@@ -17,7 +17,7 @@ databaseChangeLog:
                   name: label
                   type: varchar(255)
               - column:
-                  name: value
+                  name: description
                   type: varchar(255)
               - column:
                   name: product_id

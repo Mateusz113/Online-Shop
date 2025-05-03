@@ -6,6 +6,6 @@ import lombok.Builder;
 public record ProductDetailDto(
         Long id,
         String label,
-        String value
+        String description
 ) {
 }
