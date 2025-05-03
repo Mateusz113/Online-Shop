@@ -12,7 +12,7 @@ public record ProductDto(
         String brand,
         BigDecimal price,
         String type,
-        int availableAmount,
+        Integer availableAmount,
         List<CustomizationElementDto> customizations
 ) {
 }

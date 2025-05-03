@@ -7,7 +7,7 @@ import java.util.List;
 @Builder
 public record UpsertCustomizationElementCommand(
         String name,
-        boolean multipleChoice,
+        Boolean multipleChoice,
         List<UpsertCustomizationOptionCommand> options
 ) {
 }

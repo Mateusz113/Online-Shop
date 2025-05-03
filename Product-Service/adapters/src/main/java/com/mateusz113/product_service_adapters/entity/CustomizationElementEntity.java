@@ -29,7 +29,7 @@ public class CustomizationElementEntity {
     @Column(nullable = false)
     private Long id;
     private String name;
-    private boolean multipleChoice;
+    private Boolean multipleChoice;
     @ManyToOne
     @JoinColumn
     private ProductEntity product;

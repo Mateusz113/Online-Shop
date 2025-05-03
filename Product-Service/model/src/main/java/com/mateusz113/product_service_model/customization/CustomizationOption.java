@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class CustomizationOption {
     private Long id;
     private String name;
-    private boolean defaultOption;
+    private Boolean defaultOption;
     private BigDecimal priceDifference;
     private CustomizationElement customizationElement;
 }

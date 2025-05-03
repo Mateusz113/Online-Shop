@@ -11,7 +11,7 @@ import java.util.List;
 public class CustomizationElement {
     private Long id;
     private String name;
-    private boolean multipleChoice;
+    private Boolean multipleChoice;
     private Product product;
     private List<CustomizationOption> options;
 }

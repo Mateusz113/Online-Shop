@@ -15,7 +15,8 @@ public class Product {
     private String brand;
     private BigDecimal price;
     private String type;
-    private int availableAmount;
+    private Integer availableAmount;
+    private List<ProductDetail> details;
     private List<CustomizationElement> customizations;
 
     public void update(Product newData) {
@@ -24,6 +25,7 @@ public class Product {
         this.price = newData.price;
         this.type = newData.type;
         this.availableAmount = newData.availableAmount;
+        this.details = newData.details;
         this.customizations = newData.customizations;
     }
 }

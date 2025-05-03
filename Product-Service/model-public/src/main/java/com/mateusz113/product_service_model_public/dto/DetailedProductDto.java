@@ -9,7 +9,7 @@ public record DetailedProductDto(
         String brand,
         BigDecimal price,
         String type,
-        int availableAmount,
+        Integer availableAmount,
         List<ProductDetailDto> details,
         List<CustomizationElementDto> customizations
 ) {

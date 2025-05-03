@@ -6,10 +6,10 @@ import java.util.List;
 
 @Builder
 public record PageableContent<T>(
-        int totalPages,
-        long totalElements,
-        int pageNumber,
-        int pageSize,
+        Integer totalPages,
+        Long totalElements,
+        Integer pageNumber,
+        Integer pageSize,
         List<T> elements
 ) {
 }

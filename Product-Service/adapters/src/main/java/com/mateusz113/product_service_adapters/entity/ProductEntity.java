@@ -31,18 +31,11 @@ public class ProductEntity {
     private String brand;
     private BigDecimal price;
     private String type;
-    private int availableAmount;
+    private Integer availableAmount;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductDetailEntity> details;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomizationElementEntity> customizations;
-
-    public void update(ProductEntity newData) {
-        this.name = newData.name;
-        this.brand = newData.brand;
-        this.price = newData.price;
-        this.type = newData.type;
-        this.availableAmount = newData.availableAmount;
-        this.customizations = newData.customizations;
-    }
 
     @Override
     public boolean equals(Object obj) {

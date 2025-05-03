@@ -25,7 +25,7 @@ public class CustomizationOptionEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private boolean defaultOption;
+    private Boolean defaultOption;
     private BigDecimal priceDifference;
     @ManyToOne
     @JoinColumn

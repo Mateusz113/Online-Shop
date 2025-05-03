@@ -8,7 +8,7 @@ import java.util.List;
 public record CustomizationElementDto(
         Long id,
         String name,
-        boolean multipleChoice,
+        Boolean multipleChoice,
         List<CustomizationOptionDto> options
 ) {
 }

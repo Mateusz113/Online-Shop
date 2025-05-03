@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 @Builder
 public record UpsertCustomizationOptionCommand(
         String name,
-        boolean defaultOption,
+        Boolean defaultOption,
         BigDecimal priceDifference
 ) {
 }

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public record CustomizationOptionDto(
         Long id,
         String name,
-        boolean defaultOption,
+        Boolean defaultOption,
         BigDecimal priceDifference
 ) {
 }

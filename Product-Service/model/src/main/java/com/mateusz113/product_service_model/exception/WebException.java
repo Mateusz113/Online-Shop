@@ -6,10 +6,10 @@ import java.time.OffsetDateTime;
 
 @Getter
 public abstract class WebException extends RuntimeException {
-    private final int statusCode;
+    private final Integer statusCode;
     private final OffsetDateTime errorTime;
 
-    public WebException(String message, int statusCode, OffsetDateTime errorTime) {
+    public WebException(String message, Integer statusCode, OffsetDateTime errorTime) {
         super(message);
         this.statusCode = statusCode;
         this.errorTime = errorTime;

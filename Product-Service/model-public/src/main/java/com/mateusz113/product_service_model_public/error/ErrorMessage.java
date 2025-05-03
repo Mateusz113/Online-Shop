@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 @Builder
 public record ErrorMessage(
         String message,
-        int statusCode,
+        Integer statusCode,
         OffsetDateTime errorTime
 ) {
 }
