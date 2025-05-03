@@ -67,6 +67,11 @@
                 <artifactId>postgresql</artifactId>
                 <version>${postgres.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${spring.doc.open.api.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
