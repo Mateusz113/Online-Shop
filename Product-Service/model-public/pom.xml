@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.mateusz113.product_service</groupId>
-        <artifactId>productEntity-service</artifactId>
+        <artifactId>product-service</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
