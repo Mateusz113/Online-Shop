@@ -12,10 +12,13 @@
     <groupId>com.mateusz113.cart_service_core</groupId>
     <artifactId>cart-service-core</artifactId>
 
-    <properties>
-        <maven.compiler.source>22</maven.compiler.source>
-        <maven.compiler.target>22</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.mateusz113.cart_service_model</groupId>
+            <artifactId>cart-service-model</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
 </project>
