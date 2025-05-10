@@ -12,4 +12,10 @@ public class AppliedCustomizationOption {
     private Long sourceId;
     private String name;
     private BigDecimal priceDifference;
+    private AppliedCustomization customization;
+
+    public void fillWithSourceData(SourceCustomizationOption sourceCustomizationOption) {
+        this.name = sourceCustomizationOption.getName();
+        this.priceDifference = sourceCustomizationOption.getPriceDifference();
+    }
 }
