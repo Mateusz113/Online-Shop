@@ -11,6 +11,6 @@ public class ProductServiceCommunicatorAdapter implements ProductServiceCommunic
 
     @Override
     public SourceProduct getProductSourceData(Long id) {
-        return null;
+        return productServiceClient.getProductById(id);
     }
 }
