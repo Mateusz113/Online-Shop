@@ -6,6 +6,8 @@ import java.util.List;
 
 @Builder
 public record AppliedCustomizationDto(
+        Long id,
+        Long sourceId,
         String name,
         Boolean multipleChoice,
         List<AppliedCustomizationOptionDto> appliedOptions

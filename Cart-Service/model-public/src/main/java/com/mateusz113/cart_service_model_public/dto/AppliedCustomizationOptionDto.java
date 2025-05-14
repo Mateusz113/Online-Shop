@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 
 @Builder
 public record AppliedCustomizationOptionDto(
+        Long id,
+        Long sourceId,
         String name,
         BigDecimal priceDifference
 ) {
