@@ -2,9 +2,7 @@ package com.mateusz113.cart_service_model.product;
 
 import com.mateusz113.cart_service_model.cart.Cart;
 import com.mateusz113.cart_service_model.customization.AppliedCustomization;
-import com.mateusz113.cart_service_model.customization.AppliedCustomizationOption;
 import com.mateusz113.cart_service_model.customization.SourceCustomizationElement;
-import com.mateusz113.cart_service_model.customization.SourceCustomizationOption;
 import lombok.Builder;
 import lombok.Data;
 
@@ -33,13 +31,6 @@ public class CustomizedProduct {
                     .findFirst()
                     .orElseThrow(IllegalStateException::new);
             appliedCustomization.fillWithSourceData(sourceCustomization);
-            for (AppliedCustomizationOption appliedOption : appliedCustomization.getAppliedOptions()) {
-                SourceCustomizationOption sourceCustomizationOption = sourceCustomization.getOptions().stream()
-                        .filter(customizationOption -> customizationOption.getId().equals(appliedOption.getSourceId()))
-                        .findFirst()
-                        .orElseThrow(IllegalStateException::new);
-                appliedOption.fillWithSourceData(sourceCustomizationOption);
-            }
         }
     }
 }

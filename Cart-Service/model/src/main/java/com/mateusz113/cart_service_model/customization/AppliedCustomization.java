@@ -19,5 +19,12 @@ public class AppliedCustomization {
     public void fillWithSourceData(SourceCustomizationElement sourceCustomizationElement) {
         this.name = sourceCustomizationElement.getName();
         this.multipleChoice = sourceCustomizationElement.getMultipleChoice();
+        for (AppliedCustomizationOption appliedOption : getAppliedOptions()) {
+            SourceCustomizationOption sourceCustomizationOption = sourceCustomizationElement.getOptions().stream()
+                    .filter(customizationOption -> customizationOption.getId().equals(appliedOption.getSourceId()))
+                    .findFirst()
+                    .orElseThrow(IllegalStateException::new);
+            appliedOption.fillWithSourceData(sourceCustomizationOption);
+        }
     }
 }
