@@ -10,6 +10,7 @@ import com.mateusz113.cart_service_core.ports.outgoing.CartServiceDatabase;
 import com.mateusz113.cart_service_model.cart.Cart;
 import com.mateusz113.cart_service_model.product.CustomizedProduct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -21,6 +22,7 @@ public class CartServiceDatabaseAdapter implements CartServiceDatabase {
     private final CustomizedProductMapper productMapper;
 
     @Override
+    @Transactional
     public Cart save(Cart cart) {
         CartEntity entity = cartMapper.modelToEntity(cart);
         entity = cartRepository.save(entity);
@@ -40,13 +42,15 @@ public class CartServiceDatabaseAdapter implements CartServiceDatabase {
     }
 
     @Override
+    @Transactional
     public void delete(Cart cart) {
         CartEntity entity = cartMapper.modelToEntity(cart);
         cartRepository.delete(entity);
     }
 
     @Override
-    public void deleteProduct(CustomizedProduct customizedProduct) {
+    @Transactional
+    public void delete(CustomizedProduct customizedProduct) {
         CustomizedProductEntity entity = productMapper.modelToEntity(customizedProduct);
         productRepository.delete(entity);
     }
