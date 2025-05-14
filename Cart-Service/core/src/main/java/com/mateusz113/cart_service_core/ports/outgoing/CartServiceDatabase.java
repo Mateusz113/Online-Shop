@@ -14,5 +14,5 @@ public interface CartServiceDatabase {
 
     void delete(Cart cart);
 
-    void deleteProduct(CustomizedProduct customizedProduct);
+    void delete(CustomizedProduct customizedProduct);
 }
