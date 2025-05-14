@@ -10,15 +10,12 @@ import com.mateusz113.cart_service_core.ports.outgoing.ProductServiceCommunicato
 import com.mateusz113.cart_service_model.cart.Cart;
 import com.mateusz113.cart_service_model.exception.CartDoesNotExistException;
 import com.mateusz113.cart_service_model.exception.CustomizedProductDoesNotExistException;
-import com.mateusz113.cart_service_model.exception.CustomizedProductIllegalDataException;
-import com.mateusz113.cart_service_model.exception.SourceProductNotPresentException;
 import com.mateusz113.cart_service_model.product.CustomizedProduct;
 import com.mateusz113.cart_service_model.product.SourceProduct;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Clock;
 import java.time.OffsetDateTime;
-import java.util.Objects;
 
 @RequiredArgsConstructor
 public class CartServiceFacade implements AddCart, AddProduct, DeleteCart, DeleteProduct, GetCart {
@@ -30,13 +27,17 @@ public class CartServiceFacade implements AddCart, AddProduct, DeleteCart, Delet
     @Override
     public Cart add(Cart cart) {
         cart.setCreationDate(OffsetDateTime.now(clock));
-        cart.getCustomizedProducts().forEach(this::updateCustomizedProductWithSourceData);
+        cart.getCustomizedProducts().forEach(customizedProduct -> {
+            verifier.verifyCustomizedProduct(customizedProduct);
+            updateCustomizedProductWithSourceData(customizedProduct);
+        });
         return database.save(cart);
     }
 
     @Override
     public void add(CustomizedProduct customizedProduct, Long cartId) {
         Cart cart = findCartById(cartId);
+        verifier.verifyCustomizedProduct(customizedProduct);
         updateCustomizedProductWithSourceData(customizedProduct);
         cart.getCustomizedProducts().add(customizedProduct);
         database.save(cart);
@@ -51,35 +52,18 @@ public class CartServiceFacade implements AddCart, AddProduct, DeleteCart, Delet
     @Override
     public void deleteProduct(Long customizedProductId) {
         CustomizedProduct customizedProduct = findCustomizedProductById(customizedProductId);
-        database.deleteProduct(customizedProduct);
+        database.delete(customizedProduct);
     }
 
     @Override
-    public Cart get(Long cartId) {
+    public Cart getCart(Long cartId) {
         return findCartById(cartId);
     }
 
     private void updateCustomizedProductWithSourceData(CustomizedProduct customizedProduct) {
-        SourceProduct sourceProduct = getSourceProduct(customizedProduct.getSourceId());
-        verifier.verifyCustomizedProductAndCompareToSource(sourceProduct, customizedProduct);
+        SourceProduct sourceProduct = productServiceCommunicator.getProductSourceData(customizedProduct.getSourceId());
+        verifier.validateCustomizedProductAgainstSourceData(sourceProduct, customizedProduct);
         customizedProduct.fillWithSourceData(sourceProduct);
-    }
-
-    private SourceProduct getSourceProduct(Long sourceId) {
-        if (Objects.isNull(sourceId)) {
-            throw new CustomizedProductIllegalDataException(
-                    "Id of the source information cannot be null.",
-                    OffsetDateTime.now(clock)
-            );
-        }
-        SourceProduct sourceProduct = productServiceCommunicator.getProductSourceData(sourceId);
-        if (Objects.isNull(sourceProduct)) {
-            throw new SourceProductNotPresentException(
-                    "Could not get source data from id: %d.".formatted(sourceId),
-                    OffsetDateTime.now(clock)
-            );
-        }
-        return sourceProduct;
     }
 
     private Cart findCartById(Long cartId) {
@@ -91,6 +75,4 @@ public class CartServiceFacade implements AddCart, AddProduct, DeleteCart, Delet
         return database.findProductById(productId)
                 .orElseThrow(() -> new CustomizedProductDoesNotExistException("Product with given ID: %d, does not exist".formatted(productId), OffsetDateTime.now(clock)));
     }
-
-
 }
