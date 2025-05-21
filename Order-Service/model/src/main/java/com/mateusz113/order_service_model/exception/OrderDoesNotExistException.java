@@ -1,0 +1,9 @@
+package com.mateusz113.order_service_model.exception;
+
+import java.time.OffsetDateTime;
+
+public class OrderDoesNotExistException extends WebException {
+    public OrderDoesNotExistException(String message, OffsetDateTime errorTime) {
+        super(message, 404, errorTime);
+    }
+}
