@@ -6,10 +6,12 @@ import com.mateusz113.product_service_adapters.repository.ProductEntityRepositor
 import com.mateusz113.product_service_core.ProductServiceFacade;
 import com.mateusz113.product_service_core.ProductServiceVerifier;
 import com.mateusz113.product_service_core.ports.incoming.AddNewProducts;
+import com.mateusz113.product_service_core.ports.incoming.CheckProductsStock;
 import com.mateusz113.product_service_core.ports.incoming.DeleteProduct;
 import com.mateusz113.product_service_core.ports.incoming.GetDetailedProduct;
 import com.mateusz113.product_service_core.ports.incoming.GetProducts;
 import com.mateusz113.product_service_core.ports.incoming.UpdateProduct;
+import com.mateusz113.product_service_core.ports.incoming.UpdateProductsStock;
 import com.mateusz113.product_service_core.ports.outgoing.ProductServiceDatabase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +53,16 @@ public class ProductServiceConfiguration {
     @Bean
     public GetProducts getProducts(ProductServiceDatabase productServiceDatabase, ProductServiceVerifier verifier, Clock clock) {
         return new ProductServiceFacade(productServiceDatabase, verifier, clock);
+    }
+
+    @Bean
+    public CheckProductsStock checkProductsStock(ProductServiceDatabase database, ProductServiceVerifier verifier, Clock clock) {
+        return new ProductServiceFacade(database, verifier, clock);
+    }
+
+    @Bean
+    public UpdateProductsStock updateProductsStock(ProductServiceDatabase database, ProductServiceVerifier verifier, Clock clock) {
+        return new ProductServiceFacade(database, verifier, clock);
     }
 
     @Bean
