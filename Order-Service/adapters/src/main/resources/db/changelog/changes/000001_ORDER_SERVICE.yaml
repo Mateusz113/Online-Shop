@@ -1,0 +1,112 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Mateusz113
+      changes:
+        - createTable:
+            tableName: order_entity
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: cart_id
+                  type: bigint
+              - column:
+                  name: client_id
+                  type: bigint
+              - column:
+                  name: client_comment
+                  type: text
+              - column:
+                  name: placement_time
+                  type: JAVA.SQL.TYPES.TIMESTAMP_WITH_TIMEZONE
+              - column:
+                  name: order_status
+                  type: varchar(50)
+              - column:
+                  name: invoice
+                  type: blob
+        - createTable:
+            tableName: product_entity
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: source_id
+                  type: bigint
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: brand
+                  type: varchar(255)
+              - column:
+                  name: price
+                  type: decimal
+              - column:
+                  name: quantity
+                  type: integer
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    foreignKey: true
+                    foreignKeyName: fk_product_order
+                    references: order_entity(id)
+        - createTable:
+            tableName: customization_entity
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: multiple_choice
+                  type: boolean
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    foreignKey: true
+                    foreignKeyName: fk_customization_product
+                    references: product_entity(id)
+        - createTable:
+            tableName: customization_option_entity
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: price_difference
+                  type: decimal
+              - column:
+                  name: customization_id
+                  type: bigint
+                  constraints:
+                    foreignKey: true
+                    foreignKeyName: fk_customization_option_customization
+                    references: customization_entity(id)
+                    
