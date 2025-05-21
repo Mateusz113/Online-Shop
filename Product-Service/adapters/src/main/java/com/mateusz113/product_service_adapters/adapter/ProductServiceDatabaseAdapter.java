@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.mateusz113.product_service_adapters.specification.ProductSpecification.getSpecificationFromFilter;
@@ -31,9 +32,25 @@ public class ProductServiceDatabaseAdapter implements ProductServiceDatabase {
     }
 
     @Override
+    public void saveAll(List<Product> products) {
+        List<ProductEntity> entities = products.stream()
+                .map(mapper::modelToEntity)
+                .toList();
+        repository.saveAll(entities);
+    }
+
+    @Override
     public Optional<Product> findById(Long productId) {
         Optional<ProductEntity> entityOptional = repository.findById(productId);
         return entityOptional.map(mapper::entityToModel);
+    }
+
+    @Override
+    public List<Product> findAllByIds(List<Long> ids) {
+        List<ProductEntity> productEntities = repository.findAllById(ids);
+        return productEntities.stream()
+                .map(mapper::entityToModel)
+                .toList();
     }
 
     @Override
