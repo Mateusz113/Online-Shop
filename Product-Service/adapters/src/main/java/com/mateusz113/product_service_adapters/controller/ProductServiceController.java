@@ -4,10 +4,12 @@ import com.mateusz113.product_service_adapters.mapper.PageableContentMapper;
 import com.mateusz113.product_service_adapters.mapper.ProductFilterMapper;
 import com.mateusz113.product_service_adapters.mapper.ProductMapper;
 import com.mateusz113.product_service_core.ports.incoming.AddNewProducts;
+import com.mateusz113.product_service_core.ports.incoming.CheckProductsStock;
 import com.mateusz113.product_service_core.ports.incoming.DeleteProduct;
 import com.mateusz113.product_service_core.ports.incoming.GetDetailedProduct;
 import com.mateusz113.product_service_core.ports.incoming.GetProducts;
 import com.mateusz113.product_service_core.ports.incoming.UpdateProduct;
+import com.mateusz113.product_service_core.ports.incoming.UpdateProductsStock;
 import com.mateusz113.product_service_model.content_management.PageableContent;
 import com.mateusz113.product_service_model.filter.ProductFilter;
 import com.mateusz113.product_service_model.product.Product;
@@ -38,6 +40,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "Product Operations")
 @RestController
@@ -48,6 +51,8 @@ public class ProductServiceController {
     public final DeleteProduct deleteProduct;
     public final GetDetailedProduct getDetailedProduct;
     public final GetProducts getProducts;
+    public final CheckProductsStock checkProductsStock;
+    public final UpdateProductsStock updateProductsStock;
     public final UpdateProduct updateProduct;
     public final PageableContentMapper contentMapper;
     public final ProductMapper productMapper;
@@ -119,6 +124,52 @@ public class ProductServiceController {
     ) {
         Product product = getDetailedProduct.getById(id);
         return productMapper.modelToDetailedDto(product);
+    }
+
+    @Operation(summary = "Check if the products are available in given quantities")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "All the required stocks are available"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Not all the required quantities are available",
+                    content = @Content(schema = @Schema(implementation = ErrorMessage.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not all the passed ids are viable product ids",
+                    content = @Content(schema = @Schema(implementation = ErrorMessage.class))
+            )
+    })
+    @GetMapping("/available-amount")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void checkProductsAvailableAmounts(@RequestBody Map<Long, Integer> productStockMap) {
+        checkProductsStock.checkStock(productStockMap);
+    }
+
+    @Operation(summary = "Update product stocks")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "All the sold stocks are available"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Not all the sold quantities are available",
+                    content = @Content(schema = @Schema(implementation = ErrorMessage.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Not all the passed ids are viable product ids",
+                    content = @Content(schema = @Schema(implementation = ErrorMessage.class))
+            )
+    })
+    @PatchMapping("/available-amount")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateProductsAvailableAmounts(@RequestBody Map<Long, Integer> productStockMap) {
+        updateProductsStock.updateStock(productStockMap);
     }
 
     @Operation(summary = "Update product data")
