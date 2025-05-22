@@ -32,11 +32,14 @@ public class ProductServiceDatabaseAdapter implements ProductServiceDatabase {
     }
 
     @Override
-    public void saveAll(List<Product> products) {
+    public List<Product> saveAll(List<Product> products) {
         List<ProductEntity> entities = products.stream()
                 .map(mapper::modelToEntity)
                 .toList();
-        repository.saveAll(entities);
+        entities = repository.saveAll(entities);
+        return entities.stream()
+                .map(mapper::entityToModel)
+                .toList();
     }
 
     @Override
