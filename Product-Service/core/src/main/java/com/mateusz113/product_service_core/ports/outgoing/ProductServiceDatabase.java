@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface ProductServiceDatabase {
     Product save(Product product);
 
-    void saveAll(List<Product> products);
+    List<Product> saveAll(List<Product> products);
 
     Optional<Product> findById(Long productId);
 
