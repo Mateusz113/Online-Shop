@@ -60,7 +60,7 @@ public class ProductServiceFacade implements AddNewProducts, DeleteProduct, GetD
             if (product.getAvailableAmount() < requiredQuantity) {
                 throw new InvalidProductStockException(
                         "The current product (id: %d) stock (current stock: %d) is lower than required (required: %d).".formatted(
-                                product.getAvailableAmount(), product.getAvailableAmount(), requiredQuantity
+                                product.getId(), product.getAvailableAmount(), requiredQuantity
                         ),
                         OffsetDateTime.now(clock)
                 );
@@ -78,7 +78,7 @@ public class ProductServiceFacade implements AddNewProducts, DeleteProduct, GetD
             if (product.getAvailableAmount() < quantitySold) {
                 throw new InvalidProductStockException(
                         "The current product (id: %d) stock (current stock: %d) is lower than sold amount (required: %d).".formatted(
-                                product.getAvailableAmount(), product.getAvailableAmount(), quantitySold
+                                product.getId(), product.getAvailableAmount(), quantitySold
                         ),
                         OffsetDateTime.now(clock)
                 );
