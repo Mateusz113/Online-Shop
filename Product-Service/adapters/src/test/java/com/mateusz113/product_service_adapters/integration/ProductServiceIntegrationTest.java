@@ -11,11 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.*;
@@ -224,6 +226,32 @@ public class ProductServiceIntegrationTest {
                 .andExpect(jsonPath("$.customizations[1].options[1].name").value("name"))
                 .andExpect(jsonPath("$.customizations[1].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$.customizations[1].options[1].priceDifference").value(getDefaultPriceDifference()));
+    }
+
+    @Test
+    void checkProductsAvailableAmounts_ChecksIfTheRequiredAmountIsAvailableAndReturnsStatus204() throws Exception {
+        Map<Long, Integer> productsStockMap = Map.of(1L, 5, 2L, 5);
+
+        mockMvc.perform(get("/products/available-amount")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productsStockMap)))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void updateProductsAvailableAmounts_UpdatesProductsAvailableAmountsAndReturnsStatus204() throws Exception {
+        Map<Long, Integer> productsStockMap = Map.of(1L, 5, 2L, 5);
+
+        mockMvc.perform(patch("/products/available-amount")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productsStockMap)))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        List<Long> ids = productsStockMap.keySet().stream().toList();
+        List<Product> products = database.findAllByIds(ids);
+        products.forEach(product -> assertEquals(5, product.getAvailableAmount()));
     }
 
     @Test

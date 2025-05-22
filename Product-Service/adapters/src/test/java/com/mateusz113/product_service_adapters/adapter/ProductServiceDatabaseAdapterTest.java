@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.mateusz113.product_service_adapters.specification.ProductSpecification.getSpecificationFromFilter;
@@ -70,6 +71,42 @@ public class ProductServiceDatabaseAdapterTest {
     }
 
     @Test
+    void saveAll_SavesAndReturnsListOfSavedObjects() {
+        List<Product> productsToSave = List.of(getProduct(), getProduct());
+        List<ProductEntity> entitiesToSave = List.of(getProductEntity(), getProductEntity());
+        when(repository.saveAll(entitiesToSave)).thenReturn(entitiesToSave);
+
+        List<Product> resultList = adapter.saveAll(productsToSave);
+
+        for (Product result : resultList) {
+            assertEquals(1L, result.getId());
+            assertEquals("name", result.getName());
+            assertEquals("brand", result.getBrand());
+            assertEquals(getDefaultPrice(), result.getPrice());
+            assertEquals("type", result.getType());
+            assertEquals(getDefaultAvailableAmount(), result.getAvailableAmount());
+            for (ProductDetail detail : result.getDetails()) {
+                assertEquals(1L, detail.getId());
+                assertEquals("label", detail.getLabel());
+                assertEquals("description", detail.getDescription());
+            }
+            for (CustomizationElement element : result.getCustomizations()) {
+                assertEquals(1L, element.getId());
+                assertEquals("name", element.getName());
+                assertTrue(element.getMultipleChoice());
+                assertNull(element.getProduct());
+                for (CustomizationOption option : element.getOptions()) {
+                    assertEquals(1L, option.getId());
+                    assertEquals("name", option.getName());
+                    assertFalse(option.getDefaultOption());
+                    assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
+                    assertNull(option.getCustomizationElement());
+                }
+            }
+        }
+    }
+
+    @Test
     void findById_ReturnsOptionalOfProduct() {
         Long idToFind = 1L;
         when(repository.findById(idToFind)).thenReturn(Optional.of(getProductEntity()));
@@ -105,6 +142,42 @@ public class ProductServiceDatabaseAdapterTest {
                 },
                 () -> fail("Expected product, but optional was empty.")
         );
+    }
+
+    @Test
+    void findAllByIds_ReturnsListOfProductsWithGivenIds() {
+        List<Long> idsToFind = List.of(1L, 1L);
+        when(repository.findAllById(idsToFind)).thenReturn(List.of(getProductEntity(), getProductEntity()));
+
+        List<Product> resultList = adapter.findAllByIds(idsToFind);
+
+        assertEquals(2, resultList.size());
+        for (Product result : resultList) {
+            assertEquals(1L, result.getId());
+            assertEquals("name", result.getName());
+            assertEquals("brand", result.getBrand());
+            assertEquals(getDefaultPrice(), result.getPrice());
+            assertEquals("type", result.getType());
+            assertEquals(getDefaultAvailableAmount(), result.getAvailableAmount());
+            for (ProductDetail detail : result.getDetails()) {
+                assertEquals(1L, detail.getId());
+                assertEquals("label", detail.getLabel());
+                assertEquals("description", detail.getDescription());
+            }
+            for (CustomizationElement element : result.getCustomizations()) {
+                assertEquals(1L, element.getId());
+                assertEquals("name", element.getName());
+                assertTrue(element.getMultipleChoice());
+                assertNull(element.getProduct());
+                for (CustomizationOption option : element.getOptions()) {
+                    assertEquals(1L, option.getId());
+                    assertEquals("name", option.getName());
+                    assertFalse(option.getDefaultOption());
+                    assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
+                    assertNull(option.getCustomizationElement());
+                }
+            }
+        }
     }
 
     @Test

@@ -3,10 +3,12 @@ package com.mateusz113.product_service_adapters.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mateusz113.product_service_adapters.mapper.ProductMapper;
 import com.mateusz113.product_service_core.ports.incoming.AddNewProducts;
+import com.mateusz113.product_service_core.ports.incoming.CheckProductsStock;
 import com.mateusz113.product_service_core.ports.incoming.DeleteProduct;
 import com.mateusz113.product_service_core.ports.incoming.GetDetailedProduct;
 import com.mateusz113.product_service_core.ports.incoming.GetProducts;
 import com.mateusz113.product_service_core.ports.incoming.UpdateProduct;
+import com.mateusz113.product_service_core.ports.incoming.UpdateProductsStock;
 import com.mateusz113.product_service_model.content_management.PageableContent;
 import com.mateusz113.product_service_model.filter.ProductFilter;
 import com.mateusz113.product_service_model.product.Product;
@@ -17,10 +19,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.*;
 import static org.hamcrest.Matchers.nullValue;
@@ -47,6 +51,10 @@ public class ProductServiceControllerTest {
     public GetDetailedProduct getDetailedProduct;
     @MockitoBean
     public GetProducts getProducts;
+    @MockitoBean
+    public CheckProductsStock checkProductsStock;
+    @MockitoBean
+    public UpdateProductsStock updateProductsStock;
     @MockitoBean
     public UpdateProduct updateProduct;
 
@@ -235,6 +243,32 @@ public class ProductServiceControllerTest {
                 .andExpect(jsonPath("$.customizations[1].options[1].name").value("name"))
                 .andExpect(jsonPath("$.customizations[1].options[1].defaultOption").value(false))
                 .andExpect(jsonPath("$.customizations[1].options[1].priceDifference").value(getDefaultPriceDifference()));
+    }
+
+    @Test
+    void checkProductsAvailableAmounts_ChecksStocksAndReturnsStatus204() throws Exception {
+        Map<Long, Integer> productStockMap = Map.of(1L, 1, 2L, 2);
+
+        mockMvc.perform(get("/products/available-amount")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productStockMap)))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        verify(checkProductsStock, times(1)).checkStock(productStockMap);
+    }
+
+    @Test
+    void updateProductsAvailableAmounts_UpdatesStocksAndReturnsStatus204() throws Exception {
+        Map<Long, Integer> productStockMap = Map.of(1L, 1, 2L, 2);
+
+        mockMvc.perform(patch("/products/available-amount")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(productStockMap)))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        verify(updateProductsStock, times(1)).updateStock(productStockMap);
     }
 
     @Test
