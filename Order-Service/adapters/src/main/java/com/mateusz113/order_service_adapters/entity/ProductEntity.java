@@ -39,4 +39,20 @@ public class ProductEntity {
     @ManyToOne
     @JoinColumn
     private OrderEntity order;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof ProductEntity productEntity)) {
+            return false;
+        }
+        return id != null && id.equals(productEntity.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

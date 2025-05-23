@@ -39,4 +39,20 @@ public class OrderEntity {
     private byte[] invoice;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductEntity> products;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof OrderEntity orderEntity)) {
+            return false;
+        }
+        return id != null && id.equals(orderEntity.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

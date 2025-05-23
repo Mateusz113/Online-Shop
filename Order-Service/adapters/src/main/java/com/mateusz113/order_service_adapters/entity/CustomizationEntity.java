@@ -35,4 +35,20 @@ public class CustomizationEntity {
     @ManyToOne
     @JoinColumn
     private ProductEntity product;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof CustomizationEntity customizationEntity)) {
+            return false;
+        }
+        return id != null && id.equals(customizationEntity.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

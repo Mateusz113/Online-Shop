@@ -31,4 +31,20 @@ public class CustomizationOptionEntity {
     @ManyToOne
     @JoinColumn
     private CustomizationEntity customization;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof CustomizationOptionEntity customizationOptionEntity)) {
+            return false;
+        }
+        return id != null && id.equals(customizationOptionEntity.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
