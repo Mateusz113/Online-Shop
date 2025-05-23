@@ -247,15 +247,15 @@ public class ProductServiceControllerTest {
 
     @Test
     void checkProductsAvailableAmounts_ChecksStocksAndReturnsStatus204() throws Exception {
-        Map<Long, Integer> productStockMap = Map.of(1L, 1, 2L, 2);
+        Long productId = 1L;
+        Integer requiredStock = 5;
 
-        mockMvc.perform(get("/products/available-amount")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productStockMap)))
+        mockMvc.perform(get("/products/{productId}/available-amount", productId)
+                        .queryParam("requiredStock", String.valueOf(requiredStock)))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        verify(checkProductsStock, times(1)).checkStock(productStockMap);
+        verify(checkProductsStock, times(1)).checkStock(productId, requiredStock);
     }
 
     @Test

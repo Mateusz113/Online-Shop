@@ -230,11 +230,11 @@ public class ProductServiceIntegrationTest {
 
     @Test
     void checkProductsAvailableAmounts_ChecksIfTheRequiredAmountIsAvailableAndReturnsStatus204() throws Exception {
-        Map<Long, Integer> productsStockMap = Map.of(1L, 5, 2L, 5);
+        Long productId = 1L;
+        Integer requireStock = 5;
 
-        mockMvc.perform(get("/products/available-amount")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productsStockMap)))
+        mockMvc.perform(get("/products/{productId}/available-amount", productId)
+                        .queryParam("requiredStock", String.valueOf(requireStock)))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }

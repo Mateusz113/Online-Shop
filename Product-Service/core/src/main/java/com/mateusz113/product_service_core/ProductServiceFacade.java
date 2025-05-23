@@ -51,20 +51,15 @@ public class ProductServiceFacade implements AddNewProducts, DeleteProduct, GetD
     }
 
     @Override
-    public void checkStock(Map<Long, Integer> productsStockMap) {
-        Pair<List<Long>, List<Integer>> idsAndQuantities = getIdsAndQuantities(productsStockMap);
-        List<Product> products = findProductsByIds(idsAndQuantities.first());
-        for (int i = 0; i < products.size(); i++) {
-            Product product = products.get(i);
-            Integer requiredQuantity = idsAndQuantities.second().get(i);
-            if (product.getAvailableAmount() < requiredQuantity) {
-                throw new InvalidProductStockException(
-                        "The current product (id: %d) stock (current stock: %d) is lower than required (required: %d).".formatted(
-                                product.getId(), product.getAvailableAmount(), requiredQuantity
-                        ),
-                        OffsetDateTime.now(clock)
-                );
-            }
+    public void checkStock(Long productId, Integer requiredStock) {
+        Product product = getById(productId);
+        if (product.getAvailableAmount() < requiredStock) {
+            throw new InvalidProductStockException(
+                    "The current product (id: %d) stock (current stock: %d) is lower than required (required: %d).".formatted(
+                            product.getId(), product.getAvailableAmount(), requiredStock
+                    ),
+                    OffsetDateTime.now(clock)
+            );
         }
     }
 

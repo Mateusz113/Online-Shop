@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -143,10 +144,13 @@ public class ProductServiceController {
                     content = @Content(schema = @Schema(implementation = ErrorMessage.class))
             )
     })
-    @GetMapping("/available-amount")
+    @GetMapping("/{productId}/available-amount")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void checkProductsAvailableAmounts(@RequestBody Map<Long, Integer> productStockMap) {
-        checkProductsStock.checkStock(productStockMap);
+    public void checkProductsAvailableAmounts(
+            @Parameter(description = "Id of the product to be checked") @PathVariable Long productId,
+            @Parameter(description = "Required minimum product stock") @RequestParam Integer requiredStock
+    ) {
+        checkProductsStock.checkStock(productId, requiredStock);
     }
 
     @Operation(summary = "Update product stocks")
@@ -168,7 +172,7 @@ public class ProductServiceController {
     })
     @PatchMapping("/available-amount")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateProductsAvailableAmounts(@RequestBody Map<Long, Integer> productStockMap) {
+    public void updateProductsAvailableAmounts(@Parameter(description = "Map of product ids and sold quantities") @RequestBody Map<Long, Integer> productStockMap) {
         updateProductsStock.updateStock(productStockMap);
     }
 
