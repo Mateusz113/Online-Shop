@@ -86,7 +86,7 @@ public class OrderServiceActionFacade implements OrderServiceActionPorts {
     private void checkProductsAvailability(List<Product> products) {
         Map<Long, Integer> orderProductsData = products.stream()
                 .collect(Collectors.toMap(Product::getSourceId, Product::getQuantity));
-        if (!productServiceCommunicator.checkProductsStock(orderProductsData)) {
+        if (!productServiceCommunicator.areProductsInStock(orderProductsData)) {
             throw new ProductNotInStockException("Cannot create an order for items requested amounts, as they are not in stock.", OffsetDateTime.now(clock));
         }
     }
