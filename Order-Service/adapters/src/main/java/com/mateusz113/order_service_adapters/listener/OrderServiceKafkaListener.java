@@ -9,6 +9,7 @@ import com.mateusz113.order_service_model_public.command.ProcessOrderCommand;
 import com.mateusz113.order_service_model_public.command.UpdateOrderStatusCommand;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
 import org.springframework.retry.annotation.Backoff;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "kafka.enabled", havingValue = "true", matchIfMissing = true)
 public class OrderServiceKafkaListener {
     private final OrderServiceEventPorts eventPorts;
     private final OrderStatusUpdateMapper orderStatusUpdateMapper;
