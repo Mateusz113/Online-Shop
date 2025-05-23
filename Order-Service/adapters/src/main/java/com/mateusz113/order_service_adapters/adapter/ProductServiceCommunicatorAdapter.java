@@ -15,7 +15,7 @@ public class ProductServiceCommunicatorAdapter implements ProductServiceCommunic
     private final ProductServiceClient productClient;
 
     @Override
-    public boolean checkProductsStock(Map<Long, Integer> productsMap) {
+    public boolean areProductsInStock(Map<Long, Integer> productsMap) {
         try (Response response = productClient.checkProductsAvailability(productsMap)) {
             return response.status() == 204;
         }
