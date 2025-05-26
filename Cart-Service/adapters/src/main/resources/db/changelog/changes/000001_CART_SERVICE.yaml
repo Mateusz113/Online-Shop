@@ -1,0 +1,109 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Mateusz113
+      changes:
+        - createTable:
+            tableName: cart
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: creation_date
+                  type: JAVA.SQL.TYPES.TIMESTAMP_WITH_TIMEZONE
+        - createTable:
+            tableName: customized_product
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: source_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: brand
+                  type: varchar(255)
+              - column:
+                  name: price
+                  type: decimal
+              - column:
+                  name: quantity
+                  type: integer
+              - column:
+                  name: cart_id
+                  type: bigint
+                  constraints:
+                    foreignKey: true
+                    foreignKeyName: fk_customized_product_cart
+                    references: cart(id)
+        - createTable:
+            tableName: applied_customization
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: source_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: multiple_choice
+                  type: boolean
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    foreignKey: true
+                    foreignKeyName: pk_applied_customization_customized_product
+                    references: customized_product(id)
+        - createTable:
+            tableName: applied_customization_option
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: source_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: price_difference
+                  type: decimal
+              - column:
+                  name: customization_id
+                  type: bigint
+                  constraints:
+                    foreignKey: true
+                    foreignKeyName: pk_applied_customization_option_applied_customization
+                    references: applied_customization(id)
+                  
