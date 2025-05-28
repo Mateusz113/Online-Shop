@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record OrderProcessingData(
-        Order order,
+        Long orderId,
         EventType eventType,
         Client client
 ) {
