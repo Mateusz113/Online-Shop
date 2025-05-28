@@ -6,7 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record ProcessOrderCommand(
-        FullOrderDto fullOrderDto,
+        Long orderId,
         String eventType,
         ClientDto clientDto
 ) {
