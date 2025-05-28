@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/orders")
 @RequiredArgsConstructor
-public class OrderController {
+public class OrderServiceController {
     private final OrderServiceActionPorts actionPorts;
     private final OrderMapper orderMapper;
     private final PageableContentMapper pageableContentMapper;
