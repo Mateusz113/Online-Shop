@@ -3,6 +3,7 @@ package com.mateusz113.order_service_core.verifier;
 import com.mateusz113.order_service_model.client.Address;
 import com.mateusz113.order_service_model.client.Client;
 import com.mateusz113.order_service_model.exception.AddressIllegalDataException;
+import com.mateusz113.order_service_model.exception.ClientIllegalDataException;
 import com.mateusz113.order_service_model.exception.OrderIllegalDataException;
 import com.mateusz113.order_service_model.exception.OrderStatusUpdateIllegalDataException;
 import com.mateusz113.order_service_model.exception.ProductIllegalDataException;
@@ -37,21 +38,21 @@ public class OrderServiceVerifier {
 
     public void verifyClientData(Client client) {
         if (isNull(client.firstName())) {
-            throw new ProductIllegalDataException("First name of the client cannot be null.", OffsetDateTime.now(clock));
+            throw new ClientIllegalDataException("First name of the client cannot be null.", OffsetDateTime.now(clock));
         }
         if (isNull(client.lastName())) {
-            throw new ProductIllegalDataException("Last name of the client cannot be null.", OffsetDateTime.now(clock));
+            throw new ClientIllegalDataException("Last name of the client cannot be null.", OffsetDateTime.now(clock));
         }
         if (isNull(client.email())) {
-            throw new ProductIllegalDataException("Email of the client cannot be null.", OffsetDateTime.now(clock));
+            throw new ClientIllegalDataException("Email of the client cannot be null.", OffsetDateTime.now(clock));
         }
         if (isNull(client.phoneNumber())) {
-            throw new ProductIllegalDataException("Phone number of the client cannot be null.", OffsetDateTime.now(clock));
+            throw new ClientIllegalDataException("Phone number of the client cannot be null.", OffsetDateTime.now(clock));
         }
         verifyAddressData(client.address());
     }
 
-    private void verifyAddressData(Address address) {
+    public void verifyAddressData(Address address) {
         if (isNull(address.country())) {
             throw new AddressIllegalDataException("Country in address cannot be null.", OffsetDateTime.now(clock));
         }
