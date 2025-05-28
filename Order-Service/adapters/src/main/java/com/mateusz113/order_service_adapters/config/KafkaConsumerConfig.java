@@ -1,6 +1,6 @@
 package com.mateusz113.order_service_adapters.config;
 
-import com.fasterxml.jackson.databind.JsonDeserializer;
+
 import com.mateusz113.order_service_model_public.command.ProcessOrderCommand;
 import com.mateusz113.order_service_model_public.command.UpdateOrderStatusCommand;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +27,10 @@ public class KafkaConsumerConfig {
 
     @Bean
     public ConsumerFactory<String, UpdateOrderStatusCommand> statusConsumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(getConfigProperties());
+        JsonDeserializer<UpdateOrderStatusCommand> deserializer = new JsonDeserializer<>(UpdateOrderStatusCommand.class);
+        deserializer.addTrustedPackages("*");
+        Map<String, Object> properties = getCommonConfigProperties();
+        return new DefaultKafkaConsumerFactory<>(properties, new StringDeserializer(), deserializer);
     }
 
     @Bean
@@ -40,7 +44,10 @@ public class KafkaConsumerConfig {
 
     @Bean
     public ConsumerFactory<String, ProcessOrderCommand> processConsumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(getConfigProperties());
+        JsonDeserializer<ProcessOrderCommand> deserializer = new JsonDeserializer<>(ProcessOrderCommand.class);
+        deserializer.addTrustedPackages("*");
+        Map<String, Object> properties = getCommonConfigProperties();
+        return new DefaultKafkaConsumerFactory<>(properties, new StringDeserializer(), deserializer);
     }
 
     @Bean
@@ -52,12 +59,10 @@ public class KafkaConsumerConfig {
         return factory;
     }
 
-    private Map<String, Object> getConfigProperties() {
+    private Map<String, Object> getCommonConfigProperties() {
         Map<String, Object> configProperties = new HashMap<>();
         configProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
         configProperties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        configProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        configProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         return configProperties;
     }
 }
