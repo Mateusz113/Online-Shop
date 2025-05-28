@@ -1,5 +1,7 @@
 package com.mateusz113.order_service_adapters.config;
 
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.mateusz113.order_service_core.facade.OrderServiceActionFacade;
 import com.mateusz113.order_service_core.facade.OrderServiceEventFacade;
 import com.mateusz113.order_service_core.port.incoming.OrderServiceActionPorts;
@@ -15,6 +17,7 @@ import com.mateusz113.order_service_core.verifier.OrderServiceVerifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 
 @Configuration
@@ -22,6 +25,13 @@ public class OrderServiceConfig {
     @Bean
     public Clock clock() {
         return Clock.systemUTC();
+    }
+
+    @Bean
+    public Module bigDecimalModule() {
+        SimpleModule module = new SimpleModule("FixedPrecisionBigDecimalModule");
+        module.addSerializer(BigDecimal.class, new FixedPrecisionBigDecimalSerializer());
+        return module;
     }
 
     @Bean
