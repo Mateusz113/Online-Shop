@@ -40,8 +40,8 @@ public class OrderServiceActionFacade implements OrderServiceActionPorts {
     }
 
     @Override
-    public PageableContent<Order> getAllOrders(Integer pageNumber, Integer pageSize) {
-        return database.findAll(pageNumber, pageSize);
+    public Order getById(Long orderId) {
+        return getOrderById(orderId);
     }
 
     @Override
@@ -50,8 +50,8 @@ public class OrderServiceActionFacade implements OrderServiceActionPorts {
     }
 
     @Override
-    public Order getById(Long orderId) {
-        return getOrderById(orderId);
+    public PageableContent<Order> getAllOrders(Integer pageNumber, Integer pageSize) {
+        return database.findAll(pageNumber, pageSize);
     }
 
     @Override
@@ -79,13 +79,14 @@ public class OrderServiceActionFacade implements OrderServiceActionPorts {
 
     private void updateOrderData(Order order) {
         order.setOrderStatus(OrderStatus.PENDING);
+        order.setPlacementTime(OffsetDateTime.now(clock));
         List<Product> products = cartServiceCommunicator.getProductsData(order.getCartId());
         order.setProducts(products);
     }
 
     private void checkProductsAvailability(List<Product> products) {
         Map<Long, Integer> orderProductsData = products.stream()
-                .collect(Collectors.toMap(Product::getSourceId, Product::getQuantity));
+                .collect(Collectors.toMap(Product::getSourceId, Product::getQuantity, Integer::sum));
         if (!productServiceCommunicator.areProductsInStock(orderProductsData)) {
             throw new ProductNotInStockException("Cannot create an order for items requested amounts, as they are not in stock.", OffsetDateTime.now(clock));
         }
