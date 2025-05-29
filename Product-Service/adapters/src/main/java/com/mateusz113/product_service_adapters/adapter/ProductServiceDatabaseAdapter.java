@@ -12,12 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
 import static com.mateusz113.product_service_adapters.specification.ProductSpecification.getSpecificationFromFilter;
 
+@Component
 @RequiredArgsConstructor
 public class ProductServiceDatabaseAdapter implements ProductServiceDatabase {
     private final ProductEntityRepository repository;
