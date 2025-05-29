@@ -21,9 +21,25 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mateusz113.product_service_adapters.specification.ProductSpecification.getSpecificationFromFilter;
-import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.getDefaultAvailableAmount;
+import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.getDefaultPrice;
+import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.getDefaultPriceDifference;
+import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.getPageOfProductEntity;
+import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.getProduct;
+import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.getProductEntity;
+import static com.mateusz113.product_service_adapters.util.ProductServiceAdaptersTestUtil.getProductFilter;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ProductServiceDatabaseAdapterTest {
     private ProductServiceDatabaseAdapter adapter;
@@ -44,30 +60,7 @@ public class ProductServiceDatabaseAdapterTest {
 
         Product result = adapter.save(productToSave);
 
-        assertEquals(1L, result.getId());
-        assertEquals("name", result.getName());
-        assertEquals("brand", result.getBrand());
-        assertEquals(getDefaultPrice(), result.getPrice());
-        assertEquals("type", result.getType());
-        assertEquals(getDefaultAvailableAmount(), result.getAvailableAmount());
-        for (ProductDetail detail : result.getDetails()) {
-            assertEquals(1L, detail.getId());
-            assertEquals("label", detail.getLabel());
-            assertEquals("description", detail.getDescription());
-        }
-        for (CustomizationElement element : result.getCustomizations()) {
-            assertEquals(1L, element.getId());
-            assertEquals("name", element.getName());
-            assertTrue(element.getMultipleChoice());
-            assertNull(element.getProduct());
-            for (CustomizationOption option : element.getOptions()) {
-                assertEquals(1L, option.getId());
-                assertEquals("name", option.getName());
-                assertFalse(option.getDefaultOption());
-                assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
-                assertNull(option.getCustomizationElement());
-            }
-        }
+        assertProduct(result);
     }
 
     @Test
@@ -78,32 +71,7 @@ public class ProductServiceDatabaseAdapterTest {
 
         List<Product> resultList = adapter.saveAll(productsToSave);
 
-        for (Product result : resultList) {
-            assertEquals(1L, result.getId());
-            assertEquals("name", result.getName());
-            assertEquals("brand", result.getBrand());
-            assertEquals(getDefaultPrice(), result.getPrice());
-            assertEquals("type", result.getType());
-            assertEquals(getDefaultAvailableAmount(), result.getAvailableAmount());
-            for (ProductDetail detail : result.getDetails()) {
-                assertEquals(1L, detail.getId());
-                assertEquals("label", detail.getLabel());
-                assertEquals("description", detail.getDescription());
-            }
-            for (CustomizationElement element : result.getCustomizations()) {
-                assertEquals(1L, element.getId());
-                assertEquals("name", element.getName());
-                assertTrue(element.getMultipleChoice());
-                assertNull(element.getProduct());
-                for (CustomizationOption option : element.getOptions()) {
-                    assertEquals(1L, option.getId());
-                    assertEquals("name", option.getName());
-                    assertFalse(option.getDefaultOption());
-                    assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
-                    assertNull(option.getCustomizationElement());
-                }
-            }
-        }
+        resultList.forEach(this::assertProduct);
     }
 
     @Test
@@ -114,32 +82,7 @@ public class ProductServiceDatabaseAdapterTest {
         Optional<Product> result = adapter.findById(idToFind);
 
         result.ifPresentOrElse(
-                product -> {
-                    assertEquals(1L, product.getId());
-                    assertEquals("name", product.getName());
-                    assertEquals("brand", product.getBrand());
-                    assertEquals(getDefaultPrice(), product.getPrice());
-                    assertEquals("type", product.getType());
-                    assertEquals(getDefaultAvailableAmount(), product.getAvailableAmount());
-                    for (ProductDetail detail : product.getDetails()) {
-                        assertEquals(1L, detail.getId());
-                        assertEquals("label", detail.getLabel());
-                        assertEquals("description", detail.getDescription());
-                    }
-                    for (CustomizationElement element : product.getCustomizations()) {
-                        assertEquals(1L, element.getId());
-                        assertEquals("name", element.getName());
-                        assertTrue(element.getMultipleChoice());
-                        assertNull(element.getProduct());
-                        for (CustomizationOption option : element.getOptions()) {
-                            assertEquals(1L, option.getId());
-                            assertEquals("name", option.getName());
-                            assertFalse(option.getDefaultOption());
-                            assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
-                            assertNull(option.getCustomizationElement());
-                        }
-                    }
-                },
+                this::assertProduct,
                 () -> fail("Expected product, but optional was empty.")
         );
     }
@@ -152,32 +95,7 @@ public class ProductServiceDatabaseAdapterTest {
         List<Product> resultList = adapter.findAllByIds(idsToFind);
 
         assertEquals(2, resultList.size());
-        for (Product result : resultList) {
-            assertEquals(1L, result.getId());
-            assertEquals("name", result.getName());
-            assertEquals("brand", result.getBrand());
-            assertEquals(getDefaultPrice(), result.getPrice());
-            assertEquals("type", result.getType());
-            assertEquals(getDefaultAvailableAmount(), result.getAvailableAmount());
-            for (ProductDetail detail : result.getDetails()) {
-                assertEquals(1L, detail.getId());
-                assertEquals("label", detail.getLabel());
-                assertEquals("description", detail.getDescription());
-            }
-            for (CustomizationElement element : result.getCustomizations()) {
-                assertEquals(1L, element.getId());
-                assertEquals("name", element.getName());
-                assertTrue(element.getMultipleChoice());
-                assertNull(element.getProduct());
-                for (CustomizationOption option : element.getOptions()) {
-                    assertEquals(1L, option.getId());
-                    assertEquals("name", option.getName());
-                    assertFalse(option.getDefaultOption());
-                    assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
-                    assertNull(option.getCustomizationElement());
-                }
-            }
-        }
+        resultList.forEach(this::assertProduct);
     }
 
     @Test
@@ -195,32 +113,7 @@ public class ProductServiceDatabaseAdapterTest {
         assertEquals(2, result.totalElements());
         assertEquals(pageNumber, result.pageNumber());
         assertEquals(pageSize, result.pageSize());
-        for (Product product : result.elements()) {
-            assertEquals(1L, product.getId());
-            assertEquals("name", product.getName());
-            assertEquals("brand", product.getBrand());
-            assertEquals(getDefaultPrice(), product.getPrice());
-            assertEquals("type", product.getType());
-            assertEquals(getDefaultAvailableAmount(), product.getAvailableAmount());
-            for (ProductDetail detail : product.getDetails()) {
-                assertEquals(1L, detail.getId());
-                assertEquals("label", detail.getLabel());
-                assertEquals("description", detail.getDescription());
-            }
-            for (CustomizationElement element : product.getCustomizations()) {
-                assertEquals(1L, element.getId());
-                assertEquals("name", element.getName());
-                assertTrue(element.getMultipleChoice());
-                assertNull(element.getProduct());
-                for (CustomizationOption option : element.getOptions()) {
-                    assertEquals(1L, option.getId());
-                    assertEquals("name", option.getName());
-                    assertFalse(option.getDefaultOption());
-                    assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
-                    assertNull(option.getCustomizationElement());
-                }
-            }
-        }
+        result.elements().forEach(this::assertProduct);
     }
 
     @Test
@@ -231,5 +124,32 @@ public class ProductServiceDatabaseAdapterTest {
         adapter.delete(productToDelete);
 
         verify(repository, times(1)).delete(argThat(argumentMatcher));
+    }
+
+    private void assertProduct(Product product) {
+        assertEquals(1L, product.getId());
+        assertEquals("name", product.getName());
+        assertEquals("brand", product.getBrand());
+        assertEquals(getDefaultPrice(), product.getPrice());
+        assertEquals("type", product.getType());
+        assertEquals(getDefaultAvailableAmount(), product.getAvailableAmount());
+        for (ProductDetail detail : product.getDetails()) {
+            assertEquals(1L, detail.getId());
+            assertEquals("label", detail.getLabel());
+            assertEquals("description", detail.getDescription());
+        }
+        for (CustomizationElement element : product.getCustomizations()) {
+            assertEquals(1L, element.getId());
+            assertEquals("name", element.getName());
+            assertTrue(element.getMultipleChoice());
+            assertNull(element.getProduct());
+            for (CustomizationOption option : element.getOptions()) {
+                assertEquals(1L, option.getId());
+                assertEquals("name", option.getName());
+                assertFalse(option.getDefaultOption());
+                assertEquals(getDefaultPriceDifference(), option.getPriceDifference());
+                assertNull(option.getCustomizationElement());
+            }
+        }
     }
 }
