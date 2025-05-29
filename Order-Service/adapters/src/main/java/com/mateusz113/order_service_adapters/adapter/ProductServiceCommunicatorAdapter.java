@@ -3,8 +3,9 @@ package com.mateusz113.order_service_adapters.adapter;
 
 import com.mateusz113.order_service_adapters.client.ProductServiceClient;
 import com.mateusz113.order_service_core.port.outgoing.ProductServiceCommunicator;
-import feign.Response;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -16,9 +17,13 @@ public class ProductServiceCommunicatorAdapter implements ProductServiceCommunic
 
     @Override
     public boolean areProductsInStock(Map<Long, Integer> productsMap) {
-        try (Response response = productClient.checkProductsAvailability(productsMap)) {
-            return response.status() == 204;
+        for (Map.Entry<Long, Integer> mapEntry : productsMap.entrySet()) {
+            ResponseEntity<Void> response = productClient.checkProductsAvailability(mapEntry.getKey(), mapEntry.getValue());
+            if (response.getStatusCode() == HttpStatus.CONFLICT) {
+                return false;
+            }
         }
+        return true;
     }
 
     @Override
