@@ -30,12 +30,14 @@ public class OrderServiceDatabaseAdapter implements OrderServiceDatabase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Order> findById(Long orderId) {
         Optional<OrderEntity> orderEntityOptional = repository.findById(orderId);
         return orderEntityOptional.map(mapper::entityToModel);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageableContent<Order> findAll(Integer pageNumber, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<OrderEntity> orderEntityPage = repository.findAll(pageable);
@@ -43,6 +45,7 @@ public class OrderServiceDatabaseAdapter implements OrderServiceDatabase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public PageableContent<Order> findByClientId(Long clientId, Integer pageNumber, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         Page<OrderEntity> orderEntityPage = repository.findAllByClientId(clientId, pageable);
