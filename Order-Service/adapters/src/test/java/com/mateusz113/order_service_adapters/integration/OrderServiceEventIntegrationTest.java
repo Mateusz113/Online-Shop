@@ -25,6 +25,7 @@ import com.mateusz113.order_service_model.product.CustomizationOption;
 import com.mateusz113.order_service_model.product.Product;
 import com.mateusz113.order_service_model_public.command.ProcessOrderCommand;
 import com.mateusz113.order_service_model_public.command.UpdateOrderStatusCommand;
+import com.mateusz113.order_service_model_public.command.UpdateProductsStocksCommand;
 import com.mateusz113.order_service_model_public.dto.InvoiceDataDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
@@ -158,7 +159,7 @@ public class OrderServiceEventIntegrationTest {
         UpdateOrderStatusCommand command = getUpdateOrderStatusCommand();
         Client client = clientMapper.dtoToModel(command.clientDto());
         productServer.stubFor(patch(urlPathEqualTo("/products/available-amount"))
-                .withRequestBody(equalTo(objectMapper.writeValueAsString(Map.of(1L, 20))))
+                .withRequestBody(equalTo(objectMapper.writeValueAsString(new UpdateProductsStocksCommand(Map.of(1L, 20)))))
                 .willReturn(noContent()));
         cartServer.stubFor(delete(urlPathTemplate("/carts/{cartId}"))
                 .withPathParam("cartId", equalTo(String.valueOf(1L)))

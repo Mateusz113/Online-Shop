@@ -2,7 +2,7 @@ package com.mateusz113.order_service_adapters.client;
 
 import com.mateusz113.order_service_adapters.config.FeignConfig;
 import com.mateusz113.order_service_adapters.fallback.ProductServiceClientFallbackFactory;
-import okhttp3.Response;
+import com.mateusz113.order_service_model_public.command.UpdateProductsStocksCommand;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,5 +24,5 @@ public interface ProductServiceClient {
     ResponseEntity<Void> checkProductsAvailability(@PathVariable Long productId, @RequestParam Integer requiredStock);
 
     @PatchMapping("/products/available-amount")
-    void updateSoldProductsStock(@RequestBody Map<Long, Integer> productsStockMap);
+    void updateSoldProductsStock(@RequestBody UpdateProductsStocksCommand command);
 }

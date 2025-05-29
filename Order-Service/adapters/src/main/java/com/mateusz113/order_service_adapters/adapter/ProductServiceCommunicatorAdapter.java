@@ -3,6 +3,7 @@ package com.mateusz113.order_service_adapters.adapter;
 
 import com.mateusz113.order_service_adapters.client.ProductServiceClient;
 import com.mateusz113.order_service_core.port.outgoing.ProductServiceCommunicator;
+import com.mateusz113.order_service_model_public.command.UpdateProductsStocksCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,6 @@ public class ProductServiceCommunicatorAdapter implements ProductServiceCommunic
 
     @Override
     public void updateSoldProductsStock(Map<Long, Integer> soldProductsMap) {
-        productClient.updateSoldProductsStock(soldProductsMap);
+        productClient.updateSoldProductsStock(new UpdateProductsStocksCommand(soldProductsMap));
     }
 }

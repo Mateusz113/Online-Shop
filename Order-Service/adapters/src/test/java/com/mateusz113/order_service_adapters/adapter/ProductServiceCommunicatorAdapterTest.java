@@ -3,6 +3,7 @@ package com.mateusz113.order_service_adapters.adapter;
 import com.mateusz113.order_service_adapters.client.ProductServiceClient;
 import com.mateusz113.order_service_core.port.outgoing.ProductServiceCommunicator;
 import com.mateusz113.order_service_model.exception.ProductNotInStockException;
+import com.mateusz113.order_service_model_public.command.UpdateProductsStocksCommand;
 import feign.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,9 +65,10 @@ public class ProductServiceCommunicatorAdapterTest {
     @Test
     void updateSoldProductsStock_UpdatesProductsStock() {
         Map<Long, Integer> productsStockMap = Map.of(1L, 5, 2L, 3);
+        UpdateProductsStocksCommand command = new UpdateProductsStocksCommand(productsStockMap);
 
         communicator.updateSoldProductsStock(productsStockMap);
 
-        verify(client, times(1)).updateSoldProductsStock(productsStockMap);
+        verify(client, times(1)).updateSoldProductsStock(command);
     }
 }

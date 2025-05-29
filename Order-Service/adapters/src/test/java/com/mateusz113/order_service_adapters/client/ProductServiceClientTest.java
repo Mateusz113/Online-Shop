@@ -7,6 +7,7 @@ import com.github.tomakehurst.wiremock.matching.UrlPattern;
 import com.mateusz113.order_service_model.exception.ProductInsufficientStockException;
 import com.mateusz113.order_service_model.exception.ProductNotInStockException;
 import com.mateusz113.order_service_model.exception.ServiceCommunicationErrorException;
+import com.mateusz113.order_service_model_public.command.UpdateProductsStocksCommand;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -100,11 +101,12 @@ public class ProductServiceClientTest {
 
     @Test
     void updateSoldProductsStock_ProductServiceReturnsStatus404_ThrowsProductNotInStockException() throws JsonProcessingException {
+        UpdateProductsStocksCommand command = new UpdateProductsStocksCommand(getProductsStocksMap());
         mockServer.stubFor(patch(urlPathEqualTo("/products/available-amount"))
-                .withRequestBody(equalTo(objectMapper.writeValueAsString(getProductsStocksMap())))
+                .withRequestBody(equalTo(objectMapper.writeValueAsString(command)))
                 .willReturn(notFound()));
 
-        ProductNotInStockException exception = assertThrows(ProductNotInStockException.class, () -> client.updateSoldProductsStock(getProductsStocksMap()));
+        ProductNotInStockException exception = assertThrows(ProductNotInStockException.class, () -> client.updateSoldProductsStock(command));
 
         assertEquals("Could not update products stock as they are not present.", exception.getMessage());
         assertEquals(404, exception.getStatusCode());
@@ -112,11 +114,12 @@ public class ProductServiceClientTest {
 
     @Test
     void updateSoldProductsStock_ProductServiceReturnsStatus409_ThrowsProductInsufficientStockException() throws JsonProcessingException {
+        UpdateProductsStocksCommand command = new UpdateProductsStocksCommand(getProductsStocksMap());
         mockServer.stubFor(patch(urlPathEqualTo("/products/available-amount"))
-                .withRequestBody(equalTo(objectMapper.writeValueAsString(getProductsStocksMap())))
+                .withRequestBody(equalTo(objectMapper.writeValueAsString(command)))
                 .willReturn(status(409)));
 
-        ProductInsufficientStockException exception = assertThrows(ProductInsufficientStockException.class, () -> client.updateSoldProductsStock(getProductsStocksMap()));
+        ProductInsufficientStockException exception = assertThrows(ProductInsufficientStockException.class, () -> client.updateSoldProductsStock(command));
 
         assertEquals("Could not order products as there is not enough available.", exception.getMessage());
         assertEquals(409, exception.getStatusCode());
@@ -124,11 +127,12 @@ public class ProductServiceClientTest {
 
     @Test
     void updateSoldProductsStock_ProductServiceReturnsUncaughtStatus_ThrowsServiceCommunicationErrorException() throws JsonProcessingException {
+        UpdateProductsStocksCommand command = new UpdateProductsStocksCommand(getProductsStocksMap());
         mockServer.stubFor(patch(urlPathEqualTo("/products/available-amount"))
-                .withRequestBody(equalTo(objectMapper.writeValueAsString(getProductsStocksMap())))
+                .withRequestBody(equalTo(objectMapper.writeValueAsString(command)))
                 .willReturn(serverError()));
 
-        ServiceCommunicationErrorException exception = assertThrows(ServiceCommunicationErrorException.class, () -> client.updateSoldProductsStock(getProductsStocksMap()));
+        ServiceCommunicationErrorException exception = assertThrows(ServiceCommunicationErrorException.class, () -> client.updateSoldProductsStock(command));
 
         assertEquals("Could not communicate with product service.", exception.getMessage());
         assertEquals(500, exception.getStatusCode());
@@ -136,11 +140,12 @@ public class ProductServiceClientTest {
 
     @Test
     void updateSoldProductsStock_DataIsCorrect_UpdatesProductsStocks() throws JsonProcessingException {
+        UpdateProductsStocksCommand command = new UpdateProductsStocksCommand(getProductsStocksMap());
         mockServer.stubFor(patch(urlPathEqualTo("/products/available-amount"))
-                .withRequestBody(equalTo(objectMapper.writeValueAsString(getProductsStocksMap())))
+                .withRequestBody(equalTo(objectMapper.writeValueAsString(command)))
                 .willReturn(noContent()));
 
-        assertDoesNotThrow(() -> client.updateSoldProductsStock(getProductsStocksMap()));
+        assertDoesNotThrow(() -> client.updateSoldProductsStock(command));
     }
 
     @AfterAll
