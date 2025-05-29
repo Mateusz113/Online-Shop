@@ -1,8 +1,5 @@
 package com.mateusz113.product_service_adapters.config;
 
-import com.mateusz113.product_service_adapters.adapter.ProductServiceDatabaseAdapter;
-import com.mateusz113.product_service_adapters.mapper.ProductMapper;
-import com.mateusz113.product_service_adapters.repository.ProductEntityRepository;
 import com.mateusz113.product_service_core.ProductServiceFacade;
 import com.mateusz113.product_service_core.ProductServiceVerifier;
 import com.mateusz113.product_service_core.ports.incoming.AddNewProducts;
@@ -23,11 +20,6 @@ public class ProductServiceConfiguration {
     @Bean
     public Clock clock() {
         return Clock.systemUTC();
-    }
-
-    @Bean
-    public ProductServiceDatabase productServiceDatabase(ProductEntityRepository repository, ProductMapper mapper) {
-        return new ProductServiceDatabaseAdapter(repository, mapper);
     }
 
     @Bean
