@@ -22,9 +22,18 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-import static com.mateusz113.order_service_adapters.util.CartServiceAdaptersUtil.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getDefaultPrice;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getDefaultPriceDifference;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getDefaultQuantity;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getDefaultTime;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getOrder;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class OrderServiceDatabaseAdapterTest {
     private OrderServiceDatabase database;

@@ -10,20 +10,28 @@ import com.mateusz113.order_service_model_public.dto.CartCustomizationDto;
 import com.mateusz113.order_service_model_public.dto.CartCustomizationOptionDto;
 import com.mateusz113.order_service_model_public.dto.CartDto;
 import com.mateusz113.order_service_model_public.dto.CartProductDto;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.wiremock.spring.ConfigureWireMock;
 import org.wiremock.spring.EnableWireMock;
 import org.wiremock.spring.InjectWireMock;
 
+import java.math.RoundingMode;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static com.mateusz113.order_service_adapters.util.CartServiceAdaptersUtil.*;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getCartDto;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getDefaultPrice;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getDefaultPriceDifference;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getDefaultQuantity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @EnableWireMock(@ConfigureWireMock(name = "cart-service-client", port = 8081))
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CartServiceClientTest {
     @InjectWireMock("cart-service-client")
     private WireMockServer mockServer;
@@ -77,14 +85,14 @@ public class CartServiceClientTest {
             assertEquals(1L, productDto.sourceId());
             assertEquals("name", productDto.name());
             assertEquals("brand", productDto.brand());
-            assertEquals(getDefaultPrice(), productDto.price());
+            assertEquals(getDefaultPrice().setScale(2, RoundingMode.HALF_UP), productDto.price());
             assertEquals(getDefaultQuantity(), productDto.quantity());
             for (CartCustomizationDto customizationDto : productDto.appliedCustomizations()) {
                 assertEquals("name", customizationDto.name());
                 assertEquals(true, customizationDto.multipleChoice());
                 for (CartCustomizationOptionDto customizationOptionDto : customizationDto.appliedOptions()) {
                     assertEquals("name", customizationOptionDto.name());
-                    assertEquals(getDefaultPriceDifference(), customizationOptionDto.priceDifference());
+                    assertEquals(getDefaultPriceDifference().setScale(2, RoundingMode.HALF_UP), customizationOptionDto.priceDifference());
                 }
             }
         }
@@ -101,5 +109,10 @@ public class CartServiceClientTest {
         client.deleteCart(cartId);
 
         verify(deleteRequestedFor(template).withPathParam("cartId", equalTo(String.valueOf(cartId))));
+    }
+
+    @AfterAll
+    void cleanUp() {
+        mockServer.stop();
     }
 }

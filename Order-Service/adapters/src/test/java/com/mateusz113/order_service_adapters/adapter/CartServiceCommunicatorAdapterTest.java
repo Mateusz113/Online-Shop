@@ -12,10 +12,16 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-import static com.mateusz113.order_service_adapters.util.CartServiceAdaptersUtil.*;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getCartDto;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getDefaultPrice;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getDefaultPriceDifference;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getDefaultQuantity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class CartServiceCommunicatorAdapterTest {
     private CartServiceClient client;
@@ -34,7 +40,7 @@ public class CartServiceCommunicatorAdapterTest {
         when(client.getCartById(cartId)).thenReturn(getCartDto());
 
         List<Product> resultList = communicator.getProductsData(cartId);
-        
+
         assertEquals(2, resultList.size());
         for (Product result : resultList) {
             assertNull(result.getId());

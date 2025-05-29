@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import static com.mateusz113.order_service_adapters.util.CartServiceAdaptersUtil.getInvoiceData;
+import static com.mateusz113.order_service_adapters.util.OrderServiceAdaptersUtil.getInvoiceData;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
