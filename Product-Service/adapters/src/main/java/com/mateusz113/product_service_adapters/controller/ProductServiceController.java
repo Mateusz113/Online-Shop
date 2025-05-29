@@ -14,6 +14,7 @@ import com.mateusz113.product_service_model.content_management.PageableContent;
 import com.mateusz113.product_service_model.filter.ProductFilter;
 import com.mateusz113.product_service_model.product.Product;
 import com.mateusz113.product_service_model_public.commands.FilterProductCommand;
+import com.mateusz113.product_service_model_public.commands.UpdateProductsStocksCommand;
 import com.mateusz113.product_service_model_public.commands.UpsertProductCommand;
 import com.mateusz113.product_service_model_public.dto.DetailedProductDto;
 import com.mateusz113.product_service_model_public.dto.PageableContentDto;
@@ -41,7 +42,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @Tag(name = "Product Operations")
 @RestController
@@ -127,20 +127,20 @@ public class ProductServiceController {
         return productMapper.modelToDetailedDto(product);
     }
 
-    @Operation(summary = "Check if the products are available in given quantities")
+    @Operation(summary = "Check if the product is available in given quantity")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "204",
-                    description = "All the required stocks are available"
+                    description = "Required stock are available"
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Not all the required quantities are available",
+                    description = "Required stock is not available",
                     content = @Content(schema = @Schema(implementation = ErrorMessage.class))
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Not all the passed ids are viable product ids",
+                    description = "Passed id is not valid",
                     content = @Content(schema = @Schema(implementation = ErrorMessage.class))
             )
     })
@@ -172,8 +172,8 @@ public class ProductServiceController {
     })
     @PatchMapping("/available-amount")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateProductsAvailableAmounts(@Parameter(description = "Map of product ids and sold quantities") @RequestBody Map<Long, Integer> productStockMap) {
-        updateProductsStock.updateStock(productStockMap);
+    public void updateProductsAvailableAmounts(@Parameter(description = "Dto containing map of product ids and sold quantities") @RequestBody UpdateProductsStocksCommand updateProductsStocksCommand) {
+        updateProductsStock.updateStock(updateProductsStocksCommand.productsStocksMap());
     }
 
     @Operation(summary = "Update product data")
