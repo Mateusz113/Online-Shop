@@ -2,11 +2,14 @@ package com.mateusz113.product_service_adapters.specification;
 
 import com.mateusz113.product_service_adapters.entity.ProductEntity;
 import com.mateusz113.product_service_model.filter.ProductFilter;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProductSpecification {
     public static Specification<ProductEntity> getSpecificationFromFilter(ProductFilter filter) {
         Specification<ProductEntity> specification = Specification.where(null);
