@@ -10,9 +10,4 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface PageableContentMapper {
     PageableContentDto<OrderDto> modelToDto(PageableContent<Order> model);
-
-    default OrderDto orderModelToDto(Order model) {
-        OrderMapper mapper = Mappers.getMapper(OrderMapper.class);
-        return mapper.modelToDto(model);
-    }
 }
