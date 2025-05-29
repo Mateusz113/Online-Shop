@@ -7,7 +7,9 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface OrderProcessDataMapper {
-    @Mapping(target = "order", source = "fullOrderDto")
     @Mapping(target = "client", source = "clientDto")
     OrderProcessingData commandToModel(ProcessOrderCommand command);
+
+    @Mapping(target = "clientDto", source = "client")
+    ProcessOrderCommand modelToCommand(OrderProcessingData model);
 }
