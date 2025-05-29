@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: Mateusz113
+      changes:
+        - createTable:
+            tableName: PRODUCT_DETAIL
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: label
+                  type: varchar(255)
+              - column:
+                  name: description
+                  type: varchar(255)
+              - column:
+                  name: product_id
+                  type: bigint
+                  constraints:
+                    foreignKey: true
+                    foreignKeyName: fk_product_detail_product
+                    references: PRODUCT(id)
