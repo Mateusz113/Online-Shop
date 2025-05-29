@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mateusz113.product_service_core.ports.outgoing.ProductServiceDatabase;
 import com.mateusz113.product_service_model.customization.CustomizationOption;
 import com.mateusz113.product_service_model.product.Product;
+import com.mateusz113.product_service_model_public.commands.UpdateProductsStocksCommand;
 import com.mateusz113.product_service_model_public.commands.UpsertCustomizationOptionCommand;
 import com.mateusz113.product_service_model_public.commands.UpsertProductCommand;
 import org.junit.jupiter.api.BeforeEach;
@@ -241,15 +242,15 @@ public class ProductServiceIntegrationTest {
 
     @Test
     void updateProductsAvailableAmounts_UpdatesProductsAvailableAmountsAndReturnsStatus204() throws Exception {
-        Map<Long, Integer> productsStockMap = Map.of(1L, 5, 2L, 5);
+        UpdateProductsStocksCommand command = new UpdateProductsStocksCommand(Map.of(1L, 5, 2L, 5));
 
         mockMvc.perform(patch("/products/available-amount")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productsStockMap)))
+                        .content(objectMapper.writeValueAsString(command)))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        List<Long> ids = productsStockMap.keySet().stream().toList();
+        List<Long> ids = command.productsStocksMap().keySet().stream().toList();
         List<Product> products = database.findAllByIds(ids);
         products.forEach(product -> assertEquals(5, product.getAvailableAmount()));
     }

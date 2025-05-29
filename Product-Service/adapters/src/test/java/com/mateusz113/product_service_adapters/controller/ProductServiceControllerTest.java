@@ -12,6 +12,7 @@ import com.mateusz113.product_service_core.ports.incoming.UpdateProductsStock;
 import com.mateusz113.product_service_model.content_management.PageableContent;
 import com.mateusz113.product_service_model.filter.ProductFilter;
 import com.mateusz113.product_service_model.product.Product;
+import com.mateusz113.product_service_model_public.commands.UpdateProductsStocksCommand;
 import com.mateusz113.product_service_model_public.commands.UpsertProductCommand;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -260,15 +261,15 @@ public class ProductServiceControllerTest {
 
     @Test
     void updateProductsAvailableAmounts_UpdatesStocksAndReturnsStatus204() throws Exception {
-        Map<Long, Integer> productStockMap = Map.of(1L, 1, 2L, 2);
+        UpdateProductsStocksCommand command = new UpdateProductsStocksCommand(Map.of(1L, 1, 2L, 2));
 
         mockMvc.perform(patch("/products/available-amount")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productStockMap)))
+                        .content(objectMapper.writeValueAsString(command)))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 
-        verify(updateProductsStock, times(1)).updateStock(productStockMap);
+        verify(updateProductsStock, times(1)).updateStock(command.productsStocksMap());
     }
 
     @Test
