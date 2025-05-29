@@ -4,10 +4,12 @@ import com.mateusz113.order_service_adapters.client.ProductServiceClient;
 import com.mateusz113.order_service_model.exception.ProductInsufficientStockException;
 import com.mateusz113.order_service_model.exception.ProductNotInStockException;
 import com.mateusz113.order_service_model.exception.ServiceCommunicationErrorException;
+import com.mateusz113.order_service_model_public.dto.ProductAvailabilityDto;
 import feign.FeignException;
-import feign.Response;
 import lombok.RequiredArgsConstructor;
+import okhttp3.Response;
 import org.springframework.cloud.openfeign.FallbackFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
@@ -23,13 +25,13 @@ public class ProductServiceClientFallbackFactory implements FallbackFactory<Prod
     public ProductServiceClient create(Throwable cause) {
         return new ProductServiceClient() {
             @Override
-            public Response checkProductsAvailability(Map<Long, Integer> productStockMap) {
+            public ResponseEntity<Void> checkProductsAvailability(Long productId, Integer requiredStock) {
                 if (cause instanceof FeignException exception) {
                     if (exception.status() == 404) {
-                        throw new ProductNotInStockException("Could not verify products stock as they are not present.", OffsetDateTime.now(clock));
+                        throw new ProductNotInStockException("Could not verify stock of product with id: %d as they are not present.".formatted(productId), OffsetDateTime.now(clock));
                     }
                     if (exception.status() == 409) {
-                        return Response.builder().status(409).build();
+                        return ResponseEntity.status(409).build();
                     }
                 }
                 throw new ServiceCommunicationErrorException("Could not communicate with product service.", OffsetDateTime.now(clock));
